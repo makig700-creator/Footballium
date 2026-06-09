@@ -24,7 +24,7 @@ export async function POST(req: Request) {
     const accessToken = await signToken(payload, "access");
     const refreshToken = await signToken(payload, "refresh");
 
-    const response = NextResponse.json({ accessToken });
+    const response = NextResponse.json({ accessToken, role: user.role });
 
     response.cookies.set({
       name: "refreshToken",

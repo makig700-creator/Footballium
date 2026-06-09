@@ -176,9 +176,9 @@ export default async function AdminDashboardPage() {
                 <div className="flex justify-between items-center mb-8 px-2">
                   <div className="text-center w-1/3">
                     <div className="w-12 h-12 mx-auto bg-[#1a1a1a] rounded-full border border-gray-800 mb-2 flex items-center justify-center font-black text-xs text-gray-400">
-                      {match.homeTeam.shortName.slice(0,3)}
+                      {match.homeTeam?.shortName?.slice(0,3) || 'TBD'}
                     </div>
-                    <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest truncate">{match.homeTeam.shortName}</div>
+                    <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest truncate">{match.homeTeam?.shortName || 'TBD'}</div>
                   </div>
                   
                   <div className="w-1/3 text-center">
@@ -187,9 +187,9 @@ export default async function AdminDashboardPage() {
                   
                   <div className="text-center w-1/3">
                     <div className="w-12 h-12 mx-auto bg-[#1a1a1a] rounded-full border border-gray-800 mb-2 flex items-center justify-center font-black text-xs text-gray-400">
-                      {match.awayTeam.shortName.slice(0,3)}
+                      {match.awayTeam?.shortName?.slice(0,3) || 'TBD'}
                     </div>
-                    <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest truncate">{match.awayTeam.shortName}</div>
+                    <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest truncate">{match.awayTeam?.shortName || 'TBD'}</div>
                   </div>
                 </div>
 

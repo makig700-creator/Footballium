@@ -36,7 +36,7 @@ export function TournamentForm() {
   const [isLoading, setIsLoading] = useState(false)
 
   const form = useForm<z.infer<typeof createTournamentSchema>>({
-    resolver: zodResolver(createTournamentSchema),
+    resolver: zodResolver(createTournamentSchema) as any,
     defaultValues: {
       name: "",
       description: "",
@@ -44,7 +44,7 @@ export function TournamentForm() {
       bracketType: "ROUND_ROBIN",
       maxTeams: 16,
       minTeams: 4,
-    },
+    } as any,
   })
 
   async function onSubmit(values: z.infer<typeof createTournamentSchema>) {
@@ -163,24 +163,24 @@ export function TournamentForm() {
               <FormItem className="flex flex-col">
                 <FormLabel className="text-gray-300">Кінець реєстрації</FormLabel>
                 <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
+                  <FormControl>
+                    <PopoverTrigger render={
                       <Button
                         variant={"outline"}
                         className={cn(
                           "w-full pl-3 text-left font-normal bg-[#111111] border-gray-800 text-white",
                           !field.value && "text-muted-foreground"
                         )}
-                      >
-                        {field.value ? (
-                          format(field.value, "PPP")
-                        ) : (
-                          <span>Оберіть дату</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
+                      />
+                    }>
+                      {field.value ? (
+                        format(field.value, "PPP")
+                      ) : (
+                        <span>Оберіть дату</span>
+                      )}
+                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                    </PopoverTrigger>
+                  </FormControl>
                   <PopoverContent className="w-auto p-0 bg-[#111111] border-gray-800 text-white" align="start">
                     <Calendar
                       mode="single"
@@ -189,7 +189,6 @@ export function TournamentForm() {
                       disabled={(date) =>
                         date < new Date(new Date().setHours(0, 0, 0, 0))
                       }
-                      initialFocus
                     />
                   </PopoverContent>
                 </Popover>
@@ -205,30 +204,29 @@ export function TournamentForm() {
               <FormItem className="flex flex-col">
                 <FormLabel className="text-gray-300">Початок турніру</FormLabel>
                 <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
+                  <FormControl>
+                    <PopoverTrigger render={
                       <Button
                         variant={"outline"}
                         className={cn(
                           "w-full pl-3 text-left font-normal bg-[#111111] border-gray-800 text-white",
                           !field.value && "text-muted-foreground"
                         )}
-                      >
-                        {field.value ? (
-                          format(field.value, "PPP")
-                        ) : (
-                          <span>Оберіть дату</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
+                      />
+                    }>
+                      {field.value ? (
+                        format(field.value, "PPP")
+                      ) : (
+                        <span>Оберіть дату</span>
+                      )}
+                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                    </PopoverTrigger>
+                  </FormControl>
                   <PopoverContent className="w-auto p-0 bg-[#111111] border-gray-800 text-white" align="start">
                     <Calendar
                       mode="single"
                       selected={field.value}
                       onSelect={field.onChange}
-                      initialFocus
                     />
                   </PopoverContent>
                 </Popover>
@@ -244,30 +242,29 @@ export function TournamentForm() {
               <FormItem className="flex flex-col">
                 <FormLabel className="text-gray-300">Кінець турніру</FormLabel>
                 <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
+                  <FormControl>
+                    <PopoverTrigger render={
                       <Button
                         variant={"outline"}
                         className={cn(
                           "w-full pl-3 text-left font-normal bg-[#111111] border-gray-800 text-white",
                           !field.value && "text-muted-foreground"
                         )}
-                      >
-                        {field.value ? (
-                          format(field.value, "PPP")
-                        ) : (
-                          <span>Оберіть дату</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
+                      />
+                    }>
+                      {field.value ? (
+                        format(field.value, "PPP")
+                      ) : (
+                        <span>Оберіть дату</span>
+                      )}
+                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                    </PopoverTrigger>
+                  </FormControl>
                   <PopoverContent className="w-auto p-0 bg-[#111111] border-gray-800 text-white" align="start">
                     <Calendar
                       mode="single"
                       selected={field.value}
                       onSelect={field.onChange}
-                      initialFocus
                     />
                   </PopoverContent>
                 </Popover>

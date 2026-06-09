@@ -73,11 +73,11 @@ export function Navbar() {
                 {userMenuOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-[#0a0a0a] border border-gray-800 py-1 shadow-2xl z-50">
                     <Link
-                      href="/dashboard"
+                      href={(session.user as any)?.role === "ADMIN" ? "/admin/dashboard" : (session.user as any)?.role === "COACH" ? "/dashboard" : (session.user as any)?.role === "REFEREE" ? "/dashboard" : "/"}
                       onClick={() => setUserMenuOpen(false)}
                       className="flex items-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-wider text-gray-300 hover:text-[#CCFF00] hover:bg-gray-900 transition-colors"
                     >
-                      <BarChart3 className="w-4 h-4" /> Панель тренера
+                      <BarChart3 className="w-4 h-4" /> Мій кабінет
                     </Link>
                     <hr className="border-gray-800 my-1" />
                     <button
@@ -94,7 +94,7 @@ export function Navbar() {
                 href="/auth/login"
                 className="inline-flex shrink-0 items-center justify-center text-[11px] tracking-widest uppercase font-extrabold transition-all outline-none select-none h-9 px-5 bg-[#CCFF00] hover:bg-[#b3ff00] text-black rounded-sm"
               >
-                Вхід для тренера
+                Вхід
               </Link>
             )}
 

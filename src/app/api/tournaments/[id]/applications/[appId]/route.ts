@@ -8,7 +8,7 @@ export async function PATCH(
 ) {
   try {
     const session = await auth();
-    if (!session || (session.user as any).role !== "ADMIN") {
+    if (!session?.user || (session.user as any).role !== "ADMIN") {
       return new NextResponse("Unauthorized", { status: 403 });
     }
 
@@ -27,7 +27,7 @@ export async function PATCH(
       data: {
         status,
         reviewedAt: new Date(),
-        reviewedById: session.user.id,
+        reviewedById: session.user!.id,
       },
     });
 

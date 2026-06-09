@@ -45,7 +45,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const session = await auth();
-    if (!session || (session.user as any).role !== "ADMIN") {
+    if (!session?.user || (session.user as any).role !== "ADMIN") {
       return new NextResponse("Unauthorized", { status: 403 });
     }
 
@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
     const tournament = await prisma.tournament.create({
       data: {
         ...data,
-        createdById: session.user.id!,
+        createdById: session.user!.id!,
       },
     });
 

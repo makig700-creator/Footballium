@@ -25,4 +25,6 @@ export const createTournamentSchema = z
     path: ["maxTeams"],
   });
 
-export const updateTournamentSchema = createTournamentSchema.partial();
+export const updateTournamentSchema = createTournamentSchema.partial().extend({
+  status: z.enum(["DRAFT", "REGISTRATION", "ONGOING", "FINISHED"]).optional(),
+});
