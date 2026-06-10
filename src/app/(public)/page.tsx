@@ -53,7 +53,7 @@ export default async function HomePage() {
             
             <div className="flex flex-col sm:flex-row gap-4 pt-6">
               <Link href="/auth/register" className="inline-flex justify-center items-center px-8 py-3.5 bg-[#ccff00] hover:bg-white text-black font-extrabold uppercase text-sm tracking-widest transition-all">
-                Довести себе
+                Долучитися
               </Link>
               <Link href="/tournaments" className="inline-flex justify-center items-center px-8 py-3.5 border border-gray-600 hover:border-[#ccff00] text-[#ccff00] font-extrabold uppercase text-sm tracking-widest transition-all bg-black/50 backdrop-blur-sm">
                 Знайти турнір
@@ -77,13 +77,13 @@ export default async function HomePage() {
                    </div>
                    <div className="flex justify-between items-center">
                       <div className="text-center">
-                         <div className="font-bold text-white text-sm">{liveMatches[0].homeTeam.shortName || 'DYN'}</div>
+                         <div className="font-bold text-white text-sm">{liveMatches[0].homeTeam?.shortName || 'TBD'}</div>
                       </div>
                       <div className="text-2xl font-black text-[#ccff00]">
                          {liveMatches[0].homeScore} - {liveMatches[0].awayScore}
                       </div>
                       <div className="text-center">
-                         <div className="font-bold text-white text-sm">{liveMatches[0].awayTeam.shortName || 'SHK'}</div>
+                         <div className="font-bold text-white text-sm">{liveMatches[0].awayTeam?.shortName || 'TBD'}</div>
                       </div>
                    </div>
                    <div className="mt-2 text-center text-[10px] text-gray-500 uppercase">{liveMatches[0].minute}' Хвилина</div>

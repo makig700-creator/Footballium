@@ -100,11 +100,11 @@ export default async function DashboardPage() {
                     
                     <div className="flex items-center gap-6">
                       <div className="w-16 h-16 rounded-sm bg-[#0a0a0a] border border-gray-800 flex items-center justify-center p-2">
-                        {opponent.logo && <Image src={opponent.logo} alt={opponent.name} width={48} height={48} className="object-contain" />}
+                        {opponent?.logo && <Image src={opponent.logo} alt={opponent.name} width={48} height={48} className="object-contain" />}
                       </div>
                       <div>
                         <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">VS</p>
-                        <p className="font-black text-xl text-white uppercase tracking-wider">{opponent.name}</p>
+                        <p className="font-black text-xl text-white uppercase tracking-wider">{opponent?.name || 'TBD'}</p>
                         <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">{match.venue}</p>
                       </div>
                     </div>

@@ -60,7 +60,7 @@ export default async function LineupPage({ params }: { params: Promise<{ id: str
       
       <div className="border-b border-gray-900 pb-8">
         <h1 className="text-3xl font-black text-white tracking-tight uppercase">Налаштувати склад</h1>
-        <p className="text-[#CCFF00] font-bold text-xs uppercase tracking-widest mt-2">проти {opponent.name} • {match.venue}</p>
+        <p className="text-[#CCFF00] font-bold text-xs uppercase tracking-widest mt-2">проти {opponent?.name || 'TBD'} • {match.venue}</p>
       </div>
 
       <LineupBuilder matchId={matchId} players={players} initialLineup={initialLineup} />
