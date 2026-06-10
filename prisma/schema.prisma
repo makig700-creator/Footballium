@@ -13,17 +13,19 @@ datasource db {
 // ─── Models ──────────────────────────────────────────────────────────────────
 
 model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  password      String
-  name          String
-  role          String    @default("COACH")
-  teamId        String?
-  team          Team?     @relation(fields: [teamId], references: [id])
-  accounts      Account[]
-  sessions      Session[]
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id                  String    @id @default(cuid())
+  email               String    @unique
+  password            String
+  name                String
+  role                String    @default("USER")
+  teamId              String?
+  team                Team?     @relation(fields: [teamId], references: [id])
+  accounts            Account[]
+  sessions            Session[]
+  resetPasswordToken  String?   @unique
+  resetPasswordExpiry DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
 }
 
 model Account {

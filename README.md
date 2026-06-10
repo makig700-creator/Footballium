@@ -1,36 +1,79 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ⚽ Footballium
 
-## Getting Started
+Footballium — це сучасна комплексна веб-платформа для управління футбольними турнірами та командами. Проєкт об'єднує всіх учасників процесу: адміністраторів ліг, тренерів, суддів та вболівальників в одній екосистемі з преміальним дизайном.
 
-First, run the development server:
+## 🌟 Основні можливості
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **🏆 Для організаторів**: Створення турнірів, генерація сіток та календарів матчів, управління заявками команд.
+- **📋 Для тренерів**: Доступ до спеціальної "Панелі тренера" (Coach Dashboard), де можна керувати складом команди на сезон та формувати стартовий склад (Lineup Builder) на конкретний матч.
+- **哨 Для суддів**: Можливість заповнення протоколів матчу (голи, картки, заміни) в режимі реального часу з будь-якого пристрою.
+- **👀 Для вболівальників**: Публічний портал з новинами, результатами наживо, турнірними таблицями та профілями улюблених гравців.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🎨 Дизайн
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Платформа використовує унікальний висококонтрастний фірмовий стиль **Black & Lime**:
+- Глибокі чорні та темно-сірі фони (`#000000`, `#0a0a0a`, `#1c1a1a`).
+- Яскраво-лаймові акценти (`#CCFF00`) для активних елементів та кнопок.
+- Сучасна типографіка з використанням великих літер (uppercase) для заголовків.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🛠 Технологічний стек
 
-## Learn More
+- **Фреймворк**: [Next.js 14](https://nextjs.org/) (App Router)
+- **Стилізація**: [Tailwind CSS](https://tailwindcss.com/)
+- **Компоненти**: [shadcn/ui](https://ui.shadcn.com/)
+- **База даних**: [Prisma ORM](https://www.prisma.io/) + SQLite (для розробки)
+- **Автентифікація**: NextAuth.js
+- **Валідація**: Zod + React Hook Form
 
-To learn more about Next.js, take a look at the following resources:
+## 🚀 Встановлення та запуск (Локально)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Щоб розгорнути платформу на своєму локальному комп'ютері, виконайте наступні кроки:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. **Клонуйте репозиторій**:
+   \`\`\`bash
+   git clone https://git.ztu.edu.ua/ipz/2022-2026/ipz-22-3/biloshytskyy-maksym/footballium.git
+   cd footballium
+   \`\`\`
 
-## Deploy on Vercel
+2. **Встановіть залежності**:
+   \`\`\`bash
+   npm install
+   \`\`\`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+3. **Налаштуйте базу даних**:
+   \`\`\`bash
+   # Створення структури БД
+   npx prisma db push
+   
+   # Заповнення БД тестовими даними (команди, гравці, матчі, новини)
+   npx prisma db seed
+   \`\`\`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+4. **Запустіть сервер розробки**:
+   \`\`\`bash
+   npm run dev
+   \`\`\`
+
+5. **Відкрийте у браузері**: [http://localhost:3000](http://localhost:3000)
+
+## 🔐 Тестові акаунти (Демо-дані)
+
+Після заповнення бази даних (seed), ви можете увійти в систему за допомогою наступних облікових записів:
+
+- **Тренер (Coach)**:
+  - Email: `coach@functional.app`
+  - Пароль: `Coach123!`
+- **Адміністратор (Admin)**:
+  - Email: `admin@functional.app`
+  - Пароль: `Admin123!`
+
+## 📄 Структура проєкту
+
+- \`/src/app/(public)\` — Публічна частина сайту (Новини, Команди, Матчі).
+- \`/src/app/(coach)\` — Захищена зона для тренерів (Дашборд, Налаштування складу).
+- \`/src/app/auth\` — Сторінки автентифікації.
+- \`/src/components\` — Перевикористовувані UI компоненти (кнопки, картки, таблиці).
+- \`/prisma\` — Схема бази даних та скрипт заповнення початкових даних (\`seed.ts\`).
+
+---
+Розроблено як сучасний інструмент для автоматизації футбольних турнірів.
