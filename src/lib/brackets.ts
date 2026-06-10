@@ -7,8 +7,8 @@ import { TournamentTeam, Match } from "@prisma/client";
 export function generateRoundRobin(
   teams: string[],
   tournamentId: string
-): Omit<Match, "id" | "createdAt" | "updatedAt" | "minute" | "lineup" | "homeScore" | "awayScore">[] {
-  const matches: Omit<Match, "id" | "createdAt" | "updatedAt" | "minute" | "lineup" | "homeScore" | "awayScore">[] = [];
+): Omit<Match, "id" | "createdAt" | "updatedAt" | "minute" | "lineup" | "homeScore" | "awayScore" | "scheduledAt">[] {
+  const matches: Omit<Match, "id" | "createdAt" | "updatedAt" | "minute" | "lineup" | "homeScore" | "awayScore" | "scheduledAt">[] = [];
   const numTeams = teams.length;
   
   // If odd number of teams, add a dummy team for a "bye"
@@ -55,8 +55,8 @@ export function generateRoundRobin(
 export function generateSingleElimination(
   teams: string[],
   tournamentId: string
-): Omit<Match, "id" | "createdAt" | "updatedAt" | "minute" | "lineup" | "homeScore" | "awayScore">[] {
-  const matches: Omit<Match, "id" | "createdAt" | "updatedAt" | "minute" | "lineup" | "homeScore" | "awayScore">[] = [];
+): Omit<Match, "id" | "createdAt" | "updatedAt" | "minute" | "lineup" | "homeScore" | "awayScore" | "scheduledAt">[] {
+  const matches: Omit<Match, "id" | "createdAt" | "updatedAt" | "minute" | "lineup" | "homeScore" | "awayScore" | "scheduledAt">[] = [];
   const numTeams = teams.length;
   
   // Find next power of 2

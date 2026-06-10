@@ -12,6 +12,43 @@ datasource db {
 
 // ─── Models ──────────────────────────────────────────────────────────────────
 
+// ─── Models ──────────────────────────────────────────────────────────────────
+
+model Tournament {
+  id                     String            @id @default(cuid())
+  name                   String
+  description            String?
+  logo                   String?
+  status                 String            @default("DRAFT") // DRAFT, REGISTRATION, ONGOING, FINISHED
+  bracketType            String            // ROUND_ROBIN, SINGLE_ELIMINATION
+  maxTeams               Int
+  minTeams               Int               @default(2)
+  registrationDeadline   DateTime
+  startDate              DateTime
+  endDate                DateTime
+  createdById            String
+  createdBy              User              @relation(fields: [createdById], references: [id])
+  teams                  TournamentTeam[]
+  matches                Match[]
+  createdAt              DateTime          @default(now())
+}
+
+model TournamentTeam {
+  id             String            @id @default(cuid())
+  tournamentId   String
+  teamId         String
+  status         String            @default("PENDING") // PENDING, APPROVED, REJECTED
+  appliedAt      DateTime          @default(now())
+  reviewedAt     DateTime?
+  reviewedById   String?
+  tournament     Tournament        @relation(fields: [tournamentId], references: [id])
+  team           Team              @relation(fields: [teamId], references: [id])
+
+  @@unique([tournamentId, teamId])
+}
+
+
+
 model User {
   id                  String    @id @default(cuid())
   email               String    @unique
@@ -26,6 +63,7 @@ model User {
   resetPasswordExpiry DateTime?
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
+  tournamentsCreated  Tournament[]
 }
 
 model Account {
@@ -77,6 +115,7 @@ model Team {
   homeMatches Match[]     @relation("HomeTeam")
   awayMatches Match[]     @relation("AwayTeam")
   standings   Standings[]
+  tournaments TournamentTeam[]
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 }
@@ -114,23 +153,28 @@ model PlayerStats {
 }
 
 model Match {
-  id         String       @id @default(cuid())
-  homeTeamId String
-  awayTeamId String
-  homeTeam   Team         @relation("HomeTeam", fields: [homeTeamId], references: [id])
-  awayTeam   Team         @relation("AwayTeam", fields: [awayTeamId], references: [id])
-  homeScore  Int?
-  awayScore  Int?
-  status     String       @default("SCHEDULED")
-  kickoff    DateTime
-  venue      String
-  season     String       @default("2024/25")
-  leagueId   String       @default("premier-league")
-  minute     Int?
-  lineup     Lineup?
-  events     MatchEvent[]
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
+  id           String       @id @default(cuid())
+  tournamentId String?
+  homeTeamId   String
+  awayTeamId   String?
+  round        Int?
+  matchNumber  Int?
+  scheduledAt  DateTime?
+  tournament   Tournament?  @relation(fields: [tournamentId], references: [id])
+  homeTeam     Team         @relation("HomeTeam", fields: [homeTeamId], references: [id])
+  awayTeam     Team?        @relation("AwayTeam", fields: [awayTeamId], references: [id])
+  homeScore    Int?
+  awayScore    Int?
+  status       String       @default("SCHEDULED")
+  kickoff      DateTime
+  venue        String
+  season       String       @default("2024/25")
+  leagueId     String       @default("premier-league")
+  minute       Int?
+  lineup       Lineup?
+  events       MatchEvent[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
 }
 
 model Lineup {

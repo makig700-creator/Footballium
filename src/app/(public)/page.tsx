@@ -102,42 +102,35 @@ export default async function HomePage() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Tournament Card 1 */}
+            {/* Tournament Card 1 - ZT */}
             <div className="bg-[#1c1a1a] border border-[#2a2828] rounded-md p-6 flex flex-col relative group hover:border-gray-600 transition-colors">
-              <div className="absolute top-4 right-4 border border-green-500 text-green-500 px-2 py-0.5 text-[10px] font-black uppercase tracking-widest rounded-sm">
-                Відкрито
+              <div className="absolute top-4 right-4 border border-gray-500 text-gray-400 px-2 py-0.5 text-[10px] font-black uppercase tracking-widest rounded-sm">
+                FINISHED
               </div>
               
               <div className="h-40 flex items-center justify-center mb-6 mt-4">
-                 <Trophy className="w-24 h-24 text-amber-500 drop-shadow-[0_0_15px_rgba(245,158,11,0.2)] group-hover:scale-110 transition-transform duration-500" />
+                 <Trophy className="w-24 h-24 text-gray-400 drop-shadow-[0_0_15px_rgba(156,163,175,0.2)] group-hover:scale-110 transition-transform duration-500" />
               </div>
               
-              <h3 className="text-lg font-bold text-white mb-6 uppercase leading-snug">Київська Прем'єр Ліга 2026.</h3>
+              <h3 className="text-lg font-bold text-white mb-6 uppercase leading-snug">ЧЕМПІОНАТ ЖО м. ЖИТОМИР (ЕД)</h3>
               
               <div className="space-y-3 mb-8 text-xs text-gray-400 font-medium tracking-wide">
                 <div className="flex items-center gap-3">
-                  <Calendar className="w-4 h-4 text-gray-500" /> Травень 15, 2026
+                  <Calendar className="w-4 h-4 text-gray-500" /> 19 Жов 2025 - 08 Бер 2026
                 </div>
                 <div className="flex items-center gap-3">
-                  <MapPin className="w-4 h-4 text-gray-500" /> X-Park, Київ
+                  <Users className="w-4 h-4 text-gray-500" /> 10 Команд
                 </div>
-                <div className="flex items-center gap-3">
-                  <Users className="w-4 h-4 text-gray-500" /> 8 Дивізіонів (8x8)
+                <div className="flex items-center gap-3 text-amber-500 font-bold">
+                  <Trophy className="w-4 h-4" /> 1 місце — Енергія
                 </div>
               </div>
               
               <div className="mt-auto">
-                 <div className="flex justify-between items-center mb-4 pb-4 border-b border-[#2a2828]">
-                    <div className="text-[10px] text-gray-500 uppercase tracking-wider">Внесок:</div>
-                    <div className="text-xs text-white font-bold">15,000 ₴</div>
-                 </div>
                  <div className="flex gap-2">
-                    <Link href="/tournaments/kpl" className="flex-1 py-3 text-center bg-[#ccff00] hover:bg-[#b3ff00] text-black font-extrabold uppercase text-[11px] tracking-widest transition-colors rounded-sm">
-                      Заявитися
+                    <Link href="/tournaments/tournament-zhytomyr" className="flex-1 py-3 text-center border border-gray-700 hover:border-white text-white font-extrabold uppercase text-[11px] tracking-widest transition-colors rounded-sm bg-[#0a0a0a]">
+                      Переглянути
                     </Link>
-                    <button className="px-4 py-3 border border-gray-700 hover:border-gray-500 text-white font-extrabold uppercase text-[11px] tracking-widest transition-colors rounded-sm">
-                      Деталі
-                    </button>
                  </div>
               </div>
             </div>

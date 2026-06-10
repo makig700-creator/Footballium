@@ -54,11 +54,7 @@ export function LeagueTable({ standings }: { standings: StandingsRow[] }) {
         <TableBody className="divide-y divide-gray-800/40">
           {sortedStandings.map((row, index) => {
             const pos = index + 1
-            let posClass = ""
-            if (pos <= 4) posClass = "bg-[#1c1a1a] text-white font-bold border-l-4 border-l-blue-500" // Champions League
-            else if (pos === 5) posClass = "bg-[#1c1a1a] text-white font-bold border-l-4 border-l-orange-500" // Europa League
-            else if (pos >= sortedStandings.length - 2) posClass = "bg-[#1c1a1a] text-white font-bold border-l-4 border-l-red-500" // Relegation
-            else posClass = "text-gray-300 font-medium border-l-4 border-l-transparent"
+            let posClass = "text-gray-300 font-medium border-l-4 border-l-transparent"
 
             return (
               <TableRow key={row.id} className="hover:bg-gray-900 transition-colors group border-gray-800/40">
@@ -106,18 +102,7 @@ export function LeagueTable({ standings }: { standings: StandingsRow[] }) {
         </TableBody>
       </Table>
       
-      {/* Legend */}
-      <div className="bg-[#0a0a0a] p-4 border-t border-gray-800 flex flex-wrap gap-4 text-xs text-gray-400 font-bold uppercase tracking-widest">
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 bg-blue-500 rounded-sm"></div> Ліга чемпіонів
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 bg-orange-500 rounded-sm"></div> Ліга Європи
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 bg-red-500 rounded-sm"></div> Виліт
-        </div>
-      </div>
+
     </div>
   )
 }
