@@ -6,8 +6,8 @@ import { cn } from '@/lib/utils'
 
 export type FixtureData = {
   id: string
-  homeTeam: { id: string, name: string, shortName: string, logo: string | null }
-  awayTeam: { id: string, name: string, shortName: string, logo: string | null }
+  homeTeam: { id: string, name: string, shortName: string, logo: string | null } | null
+  awayTeam: { id: string, name: string, shortName: string, logo: string | null } | null
   homeScore: number | null
   awayScore: number | null
   status: string
@@ -59,10 +59,10 @@ export function FixtureCard({ match }: { match: FixtureData }) {
             {/* Home Team */}
             <div className="flex flex-col items-center gap-3 flex-1">
               <div className="w-16 h-16 rounded-sm bg-[#0a0a0a] border border-gray-800 flex items-center justify-center relative p-2 shadow-inner group-hover:border-gray-600 transition-colors">
-                {match.homeTeam.logo && <Image src={match.homeTeam.logo} alt={match.homeTeam.name} fill className="object-contain p-2" />}
+                {match.homeTeam?.logo && <Image src={match.homeTeam.logo} alt={match.homeTeam.name} fill className="object-contain p-2" />}
               </div>
               <span className="font-black text-white text-center text-sm uppercase tracking-wider group-hover:text-[#CCFF00] transition-colors">
-                {match.homeTeam.shortName}
+                {match.homeTeam?.shortName || 'TBD'}
               </span>
             </div>
 
@@ -88,10 +88,10 @@ export function FixtureCard({ match }: { match: FixtureData }) {
             {/* Away Team */}
             <div className="flex flex-col items-center gap-3 flex-1">
               <div className="w-16 h-16 rounded-sm bg-[#0a0a0a] border border-gray-800 flex items-center justify-center relative p-2 shadow-inner group-hover:border-gray-600 transition-colors">
-                {match.awayTeam.logo && <Image src={match.awayTeam.logo} alt={match.awayTeam.name} fill className="object-contain p-2" />}
+                {match.awayTeam?.logo && <Image src={match.awayTeam.logo} alt={match.awayTeam.name} fill className="object-contain p-2" />}
               </div>
               <span className="font-black text-white text-center text-sm uppercase tracking-wider group-hover:text-[#CCFF00] transition-colors">
-                {match.awayTeam.shortName}
+                {match.awayTeam?.shortName || 'TBD'}
               </span>
             </div>
           </div>
