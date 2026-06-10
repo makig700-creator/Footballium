@@ -61,8 +61,10 @@ export function TournamentForm() {
         throw new Error(error.message || "Failed to create tournament")
       }
 
+      const newTournament = await res.json()
+
       toast.success("Турнір успішно створено")
-      router.push("/admin/tournaments")
+      router.push(`/admin/tournaments/${newTournament.id}`)
       router.refresh()
     } catch (error: any) {
       toast.error(error.message)
