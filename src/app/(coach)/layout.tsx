@@ -23,7 +23,7 @@ export default function CoachLayout({
               <CalendarDays className="w-4 h-4" />
               Матчі
             </Link>
-            <Link href="#" className="flex items-center gap-3 px-4 py-3 rounded-sm text-gray-400 hover:text-[#CCFF00] hover:bg-gray-900 border border-transparent hover:border-gray-800 transition-colors font-bold uppercase tracking-widest text-xs">
+            <Link href="/coach/team" className="flex items-center gap-3 px-4 py-3 rounded-sm text-gray-400 hover:text-[#CCFF00] hover:bg-gray-900 border border-transparent hover:border-gray-800 transition-colors font-bold uppercase tracking-widest text-xs">
               <Users className="w-4 h-4" />
               Склад
             </Link>

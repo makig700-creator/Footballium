@@ -22,7 +22,8 @@ export async function GET(request: Request) {
     prisma.player.findMany({
       where: {
         OR: [
-          { name: { contains: query } },
+          { firstName: { contains: query } },
+          { lastName: { contains: query } },
           { nationality: { contains: query } },
         ],
       },

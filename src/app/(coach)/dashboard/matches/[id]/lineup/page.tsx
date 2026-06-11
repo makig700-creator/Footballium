@@ -52,6 +52,11 @@ export default async function LineupPage({ params }: { params: Promise<{ id: str
   const isHome = match.homeTeamId === teamId
   const opponent = isHome ? match.awayTeam : match.homeTeam
 
+  const playersWithNames = players.map(p => ({
+    ...p,
+    name: `${p.firstName} ${p.lastName}`.trim()
+  }))
+
   return (
     <div className="max-w-6xl mx-auto space-y-12">
       <Link href="/dashboard" className="inline-flex items-center gap-2 text-xs text-[#CCFF00] font-black uppercase tracking-widest hover:text-white transition-colors">
@@ -63,7 +68,7 @@ export default async function LineupPage({ params }: { params: Promise<{ id: str
         <p className="text-[#CCFF00] font-bold text-xs uppercase tracking-widest mt-2">проти {opponent?.name || 'TBD'} • {match.venue}</p>
       </div>
 
-      <LineupBuilder matchId={matchId} players={players} initialLineup={initialLineup} />
+      <LineupBuilder matchId={matchId} players={playersWithNames as any} initialLineup={initialLineup} />
     </div>
   )
 }

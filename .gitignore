@@ -50,3 +50,6 @@ next-env.d.ts
 *.db-journal
 *.sqlite
 *.sqlite3
+
+AGENTS.md
+CLAUDE.md

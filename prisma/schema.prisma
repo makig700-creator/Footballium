@@ -15,54 +15,53 @@ datasource db {
 // ─── Models ──────────────────────────────────────────────────────────────────
 
 model Tournament {
-  id                     String            @id @default(cuid())
-  name                   String
-  description            String?
-  logo                   String?
-  status                 String            @default("DRAFT") // DRAFT, REGISTRATION, ONGOING, FINISHED
-  bracketType            String            // ROUND_ROBIN, SINGLE_ELIMINATION
-  maxTeams               Int
-  minTeams               Int               @default(2)
-  registrationDeadline   DateTime
-  startDate              DateTime
-  endDate                DateTime
-  createdById            String
-  createdBy              User              @relation(fields: [createdById], references: [id])
-  teams                  TournamentTeam[]
-  matches                Match[]
-  createdAt              DateTime          @default(now())
+  id                   String           @id @default(cuid())
+  name                 String
+  description          String?
+  logo                 String?
+  status               String           @default("DRAFT") // DRAFT, REGISTRATION, ONGOING, FINISHED
+  bracketType          String // ROUND_ROBIN, SINGLE_ELIMINATION
+  maxTeams             Int
+  minTeams             Int              @default(2)
+  registrationDeadline DateTime
+  startDate            DateTime
+  endDate              DateTime
+  createdById          String
+  createdBy            User             @relation(fields: [createdById], references: [id])
+  teams                TournamentTeam[]
+  matches              Match[]
+  createdAt            DateTime         @default(now())
 }
 
 model TournamentTeam {
-  id             String            @id @default(cuid())
-  tournamentId   String
-  teamId         String
-  status         String            @default("PENDING") // PENDING, APPROVED, REJECTED
-  appliedAt      DateTime          @default(now())
-  reviewedAt     DateTime?
-  reviewedById   String?
-  tournament     Tournament        @relation(fields: [tournamentId], references: [id])
-  team           Team              @relation(fields: [teamId], references: [id])
+  id           String     @id @default(cuid())
+  tournamentId String
+  teamId       String
+  status       String     @default("PENDING") // PENDING, APPROVED, REJECTED
+  appliedAt    DateTime   @default(now())
+  reviewedAt   DateTime?
+  reviewedById String?
+  tournament   Tournament @relation(fields: [tournamentId], references: [id])
+  team         Team       @relation(fields: [teamId], references: [id])
 
   @@unique([tournamentId, teamId])
 }
 
-
-
 model User {
-  id                  String    @id @default(cuid())
-  email               String    @unique
+  id                  String       @id @default(cuid())
+  email               String       @unique
   password            String
   name                String
-  role                String    @default("USER")
+  role                String       @default("USER")
   teamId              String?
-  team                Team?     @relation(fields: [teamId], references: [id])
+  team                Team?        @relation("UserTeam", fields: [teamId], references: [id])
+  teamCoached         Team?        @relation("TeamCoach")
   accounts            Account[]
   sessions            Session[]
-  resetPasswordToken  String?   @unique
+  resetPasswordToken  String?      @unique
   resetPasswordExpiry DateTime?
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
   tournamentsCreated  Tournament[]
 }
 
@@ -101,28 +100,31 @@ model VerificationToken {
 }
 
 model Team {
-  id          String      @id @default(cuid())
-  name        String
-  shortName   String
-  logo        String?
-  primaryColor String     @default("#1a1a2e")
-  city        String
-  stadium     String
-  founded     Int
-  description String?
-  players     Player[]
-  coaches     User[]
-  homeMatches Match[]     @relation("HomeTeam")
-  awayMatches Match[]     @relation("AwayTeam")
-  standings   Standings[]
-  tournaments TournamentTeam[]
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  id           String           @id @default(cuid())
+  name         String
+  shortName    String
+  logo         String?
+  primaryColor String           @default("#1a1a2e")
+  city         String
+  stadium      String
+  founded      Int
+  description  String?
+  players      Player[]
+  coaches      User[]           @relation("UserTeam")
+  homeMatches  Match[]          @relation("HomeTeam")
+  awayMatches  Match[]          @relation("AwayTeam")
+  standings    Standings[]
+  tournaments  TournamentTeam[]
+  coachId      String?          @unique
+  coach        User?            @relation("TeamCoach", fields: [coachId], references: [id])
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
 }
 
 model Player {
   id          String       @id @default(cuid())
-  name        String
+  firstName   String
+  lastName    String
   position    String
   number      Int
   nationality String
@@ -136,20 +138,22 @@ model Player {
   lineupSlots LineupSlot[]
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
+
+  @@unique([teamId, number])
 }
 
 model PlayerStats {
-  id            String  @id @default(cuid())
-  playerId      String  @unique
-  player        Player  @relation(fields: [playerId], references: [id], onDelete: Cascade)
-  appearances   Int     @default(0)
-  goals         Int     @default(0)
-  assists       Int     @default(0)
-  yellowCards   Int     @default(0)
-  redCards      Int     @default(0)
-  minutesPlayed Int     @default(0)
-  cleanSheets   Int     @default(0)
-  rating        Float   @default(0)
+  id            String @id @default(cuid())
+  playerId      String @unique
+  player        Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  appearances   Int    @default(0)
+  goals         Int    @default(0)
+  assists       Int    @default(0)
+  yellowCards   Int    @default(0)
+  redCards      Int    @default(0)
+  minutesPlayed Int    @default(0)
+  cleanSheets   Int    @default(0)
+  rating        Float  @default(0)
 }
 
 model Match {
@@ -198,16 +202,16 @@ model LineupSlot {
 }
 
 model MatchEvent {
-  id        String    @id @default(cuid())
-  matchId   String
-  match     Match     @relation(fields: [matchId], references: [id])
-  type      String
-  minute    Int
-  teamId    String
-  playerId  String?
+  id         String   @id @default(cuid())
+  matchId    String
+  match      Match    @relation(fields: [matchId], references: [id])
+  type       String
+  minute     Int
+  teamId     String
+  playerId   String?
   playerName String?
-  detail    String?
-  createdAt DateTime  @default(now())
+  detail     String?
+  createdAt  DateTime @default(now())
 }
 
 model News {

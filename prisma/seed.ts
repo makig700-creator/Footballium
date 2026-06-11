@@ -112,18 +112,24 @@ async function main() {
   ]
 
   for (const p of arsenalPlayers) {
+    const { name, ...rest } = p;
+    const [firstName, ...lastNameArr] = name.split(' ');
+    const lastName = lastNameArr.join(' ') || '';
     await prisma.player.upsert({
       where: { id: p.id },
       update: {},
-      create: { ...p, teamId: arsenal.id },
+      create: { ...rest, firstName, lastName, teamId: arsenal.id },
     })
   }
 
   for (const p of chelseaPlayers) {
+    const { name, ...rest } = p;
+    const [firstName, ...lastNameArr] = name.split(' ');
+    const lastName = lastNameArr.join(' ') || '';
     await prisma.player.upsert({
       where: { id: p.id },
       update: {},
-      create: { ...p, teamId: chelsea.id },
+      create: { ...rest, firstName, lastName, teamId: chelsea.id },
     })
   }
 
@@ -404,12 +410,16 @@ async function main() {
   for (const [teamName, players] of Object.entries(zhytomyrPlayersData)) {
     const team = createdZhytomyrTeams[teamName];
     for (let i = 0; i < players.length; i++) {
+      const fullName = players[i];
+      const [firstName, ...lastNameArr] = fullName.split(' ');
+      const lastName = lastNameArr.join(' ') || '';
       await prisma.player.upsert({
         where: { id: `p-${team.id}-${i}` },
         update: {},
         create: {
           id: `p-${team.id}-${i}`,
-          name: players[i],
+          firstName,
+          lastName,
           position: i === 0 ? Position.GK : Position.MID,
           number: i + 1,
           nationality: 'Ukraine',

@@ -4,7 +4,8 @@ import { User, Flag } from 'lucide-react'
 
 export type PlayerCardData = {
   id: string
-  name: string
+  firstName: string
+  lastName: string
   position: string
   number: number
   nationality: string
@@ -33,7 +34,7 @@ export function PlayerCard({ player }: { player: PlayerCardData }) {
         
         <div className="flex-1 min-w-0">
           <h3 className="text-lg font-bold text-white uppercase truncate group-hover:text-[#CCFF00] transition-colors">
-            {player.name}
+            {player.firstName} {player.lastName}
           </h3>
           <div className="flex items-center gap-2 mt-1">
             <span className={cn("text-[10px] font-bold px-1.5 py-0.5 rounded-sm border uppercase tracking-wider", posColor)}>

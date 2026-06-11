@@ -121,7 +121,7 @@ function SearchContent() {
                         <User className="w-6 h-6 text-gray-500 group-hover:text-[#CCFF00]" />
                       </div>
                       <div>
-                        <h3 className="font-bold text-white uppercase tracking-wider group-hover:text-[#CCFF00] transition-colors">{player.name}</h3>
+                        <h3 className="font-bold text-white uppercase tracking-wider group-hover:text-[#CCFF00] transition-colors">{player.firstName} {player.lastName}</h3>
                         <p className="text-[10px] uppercase font-bold text-gray-500 tracking-widest">{player.team.shortName} · {formatPosition(player.position)}</p>
                       </div>
                     </div>
