@@ -9,7 +9,7 @@ export default async function PlayersPage() {
     include: {
       team: { select: { id: true, shortName: true } }
     },
-    orderBy: { name: 'asc' }
+    orderBy: { lastName: 'asc' }
   })
 
   return (

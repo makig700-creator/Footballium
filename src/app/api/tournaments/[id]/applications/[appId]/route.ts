@@ -36,3 +36,53 @@ export async function PATCH(
     return new NextResponse("Internal Error", { status: 500 });
   }
 }
+
+export async function DELETE(
+  req: NextRequest,
+  props: { params: Promise<{ id: string; appId: string }> }
+) {
+  try {
+    const session = await auth();
+    const role = (session?.user as any)?.role;
+    const userId = session?.user?.id;
+
+    if (!session || role !== "COACH" || !userId) {
+      return new NextResponse("Unauthorized. Must be a coach.", { status: 403 });
+    }
+
+    const params = await props.params;
+
+    const team = await prisma.team.findUnique({
+      where: { coachId: userId },
+    });
+
+    if (!team) {
+      return new NextResponse("Must create a team first.", { status: 400 });
+    }
+
+    const application = await prisma.tournamentTeam.findUnique({
+      where: { id: params.appId },
+    });
+
+    if (!application) {
+      return new NextResponse("Application not found", { status: 404 });
+    }
+
+    if (application.teamId !== team.id) {
+      return new NextResponse("Unauthorized. You can only withdraw your own team's application.", { status: 403 });
+    }
+
+    if (application.status !== "PENDING") {
+      return new NextResponse("Can only withdraw PENDING applications.", { status: 400 });
+    }
+
+    await prisma.tournamentTeam.delete({
+      where: { id: params.appId },
+    });
+
+    return new NextResponse(null, { status: 204 });
+  } catch (error) {
+    console.error(error);
+    return new NextResponse("Internal Error", { status: 500 });
+  }
+}

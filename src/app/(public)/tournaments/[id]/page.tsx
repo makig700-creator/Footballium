@@ -1,13 +1,21 @@
 import { notFound } from "next/navigation"
 import Image from "next/image"
+import Link from "next/link"
 import { prisma } from "@/lib/prisma"
-import { Calendar, Users, Trophy, Shield } from "lucide-react"
+import { auth } from "@/lib/auth"
+import { Calendar, Users, Trophy, Shield, MapPin, Activity } from "lucide-react"
 import { LeagueTable } from "@/components/standings/LeagueTable"
+import { TournamentApplicationBlock } from "@/components/tournaments/tournament-application-block"
+import { getApplicationStatus } from "@/lib/tournament-utils"
 
 export const revalidate = 60 // Revalidate every minute
 
 export default async function TournamentPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
+  const session = await auth()
+  const user = session?.user as any
+  const isCoach = user?.role === 'COACH'
+  const userId = user?.id
 
   const tournament = await prisma.tournament.findUnique({
     where: { id },
@@ -15,7 +23,19 @@ export default async function TournamentPage({ params }: { params: Promise<{ id:
       teams: {
         where: { status: 'APPROVED' },
         include: {
-          team: true
+          team: {
+            include: {
+              _count: { select: { players: true } },
+              coach: true
+            }
+          }
+        }
+      },
+      matches: {
+        orderBy: { kickoff: 'asc' },
+        include: {
+          homeTeam: true,
+          awayTeam: true
         }
       }
     }
@@ -25,11 +45,24 @@ export default async function TournamentPage({ params }: { params: Promise<{ id:
     notFound()
   }
 
+  // Fetch application status for coach
+  const appStatusObj = isCoach && userId ? await getApplicationStatus(tournament.id, userId) : { status: null, hasTeam: false, appId: null, teamId: null }
+  
+  // We can fetch coach team name if they have one to display in the block
+  let coachTeamName = undefined
+  if (appStatusObj.teamId) {
+    const t = await prisma.team.findUnique({ where: { id: appStatusObj.teamId }})
+    if (t) coachTeamName = t.name
+  }
+
   // Fetch standings
   const standings = await prisma.standings.findMany({
     where: { leagueId: tournament.id },
     include: { team: true }
   })
+
+  const approvedTeamsCount = tournament.teams.length
+  const fillPercentage = Math.min(100, Math.round((approvedTeamsCount / tournament.maxTeams) * 100))
 
   return (
     <div className="min-h-screen bg-[#000000] text-gray-200">
@@ -50,8 +83,10 @@ export default async function TournamentPage({ params }: { params: Promise<{ id:
           </div>
           
           <div className="flex-1 text-center md:text-left space-y-5">
-            <div className="inline-flex items-center justify-center px-3 py-1 bg-[#1a1a1a] border border-gray-800 text-[10px] font-black uppercase tracking-widest text-[#ccff00] rounded-sm">
-              {tournament.status}
+            <div className="flex items-center justify-center md:justify-start gap-3">
+              <div className="inline-flex items-center justify-center px-3 py-1 bg-[#1a1a1a] border border-gray-800 text-[10px] font-black uppercase tracking-widest text-[#ccff00] rounded-sm">
+                {tournament.status}
+              </div>
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white uppercase tracking-tighter leading-[0.9]">
               {tournament.name}
@@ -66,32 +101,170 @@ export default async function TournamentPage({ params }: { params: Promise<{ id:
                 {new Date(tournament.startDate).toLocaleDateString('uk-UA')} - {new Date(tournament.endDate).toLocaleDateString('uk-UA')}
               </div>
               <div className="flex items-center gap-2 bg-[#111111] border border-gray-800 px-4 py-2 rounded-sm">
-                <Users className="w-4 h-4 text-[#ccff00]" />
-                {tournament.teams.length} / {tournament.maxTeams} Команд
-              </div>
-              <div className="flex items-center gap-2 bg-[#111111] border border-gray-800 px-4 py-2 rounded-sm">
                 <Shield className="w-4 h-4 text-[#ccff00]" />
                 {tournament.bracketType.replace('_', ' ')}
               </div>
+              <div className="flex items-center gap-2 bg-[#111111] border border-gray-800 px-4 py-2 rounded-sm">
+                <MapPin className="w-4 h-4 text-[#ccff00]" />
+                Київ
+              </div>
             </div>
+
+            {/* Progress Bar for Registration */}
+            {(tournament.status === 'REGISTRATION' || tournament.status === 'DRAFT') && (
+              <div className="mt-8 max-w-md bg-[#111111] border border-gray-800 p-4 rounded-sm">
+                 <div className="flex justify-between items-center mb-2">
+                    <span className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Заповненість:</span>
+                    <span className="text-xs text-[#ccff00] font-black">{approvedTeamsCount} / {tournament.maxTeams} КОМАНД</span>
+                 </div>
+                 <div className="h-2 bg-gray-900 rounded-full overflow-hidden">
+                    <div className="h-full bg-[#ccff00] transition-all duration-1000" style={{ width: `${fillPercentage}%` }}></div>
+                 </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
 
       {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-24">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         
-        {/* Standings */}
-        {standings.length > 0 && (
-          <section className="space-y-8">
-            <div className="flex items-center gap-6">
-              <h2 className="text-2xl md:text-3xl font-black text-white uppercase tracking-tighter">Турнірна таблиця</h2>
-              <div className="h-[2px] flex-1 bg-gradient-to-r from-[#ccff00] to-transparent opacity-20"></div>
-            </div>
-            <LeagueTable standings={standings} />
-          </section>
-        )}
+        <div className="flex flex-col lg:flex-row gap-12">
+          
+          {/* Main Content Column */}
+          <div className="flex-1 space-y-16">
+            
+            {/* Participating Teams */}
+            <section className="space-y-6">
+              <div className="flex items-center gap-4 border-b border-gray-900 pb-4">
+                <Users className="w-6 h-6 text-[#ccff00]" />
+                <h2 className="text-2xl font-black text-white uppercase tracking-tighter">Команди-учасники</h2>
+                <span className="bg-[#111111] text-gray-400 px-2 py-1 rounded-sm text-xs font-black">{approvedTeamsCount}</span>
+              </div>
+              
+              {approvedTeamsCount === 0 ? (
+                <div className="bg-[#111111] border border-gray-800 border-dashed rounded-sm p-12 text-center">
+                  <p className="text-gray-500 font-bold uppercase tracking-widest text-sm">Жодної команди ще не затверджено</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {tournament.teams.map(({ team }) => (
+                    <Link href={`/teams/${team.id}`} key={team.id} className="bg-[#111111] border border-gray-800 rounded-sm p-4 flex items-center gap-4 group hover:border-[#ccff00] transition-colors">
+                      <div className="w-12 h-12 bg-[#0a0a0a] rounded-sm flex items-center justify-center p-1 border border-gray-800 group-hover:border-[#ccff00]/50">
+                        {team.logo ? (
+                          <Image src={team.logo} alt={team.name} width={40} height={40} className="object-contain" />
+                        ) : (
+                          <Shield className="w-6 h-6 text-gray-700" />
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-bold text-white uppercase tracking-wider truncate">{team.name}</p>
+                        <p className="text-[10px] text-gray-500 uppercase tracking-widest truncate">Тренер: {team.coach?.name || 'Н/Д'}</p>
+                      </div>
+                      <div className="bg-[#0a0a0a] px-3 py-1 rounded-sm border border-gray-800">
+                        <span className="text-xs font-black text-[#ccff00]">{team._count.players}</span>
+                        <span className="text-[10px] text-gray-500 ml-1">ГР</span>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </section>
 
+            {/* Standings */}
+            {standings.length > 0 && (
+              <section className="space-y-6">
+                <div className="flex items-center gap-4 border-b border-gray-900 pb-4">
+                  <Trophy className="w-6 h-6 text-[#ccff00]" />
+                  <h2 className="text-2xl font-black text-white uppercase tracking-tighter">Турнірна таблиця</h2>
+                </div>
+                <LeagueTable standings={standings} />
+              </section>
+            )}
+
+            {/* Match Schedule */}
+            {(tournament.status === 'ONGOING' || tournament.status === 'FINISHED') && tournament.matches.length > 0 && (
+               <section className="space-y-6">
+                 <div className="flex items-center gap-4 border-b border-gray-900 pb-4">
+                   <Activity className="w-6 h-6 text-[#ccff00]" />
+                   <h2 className="text-2xl font-black text-white uppercase tracking-tighter">Розклад та Результати</h2>
+                 </div>
+                 
+                 <div className="bg-[#111111] border border-gray-800 rounded-sm divide-y divide-gray-900">
+                    {tournament.matches.map(match => (
+                      <div key={match.id} className="p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div className="flex items-center gap-4 w-full sm:w-1/3">
+                           <div className="text-right w-full">
+                              <p className="font-bold text-white text-sm uppercase tracking-wider truncate">{match.homeTeam.name}</p>
+                           </div>
+                           <div className="w-8 h-8 shrink-0 bg-[#0a0a0a] rounded-sm flex items-center justify-center p-1 border border-gray-800">
+                              {match.homeTeam.logo ? <Image src={match.homeTeam.logo} alt={match.homeTeam.name} width={24} height={24} className="object-contain" /> : <Shield className="w-4 h-4 text-gray-700" />}
+                           </div>
+                        </div>
+                        
+                        <div className="flex flex-col items-center justify-center shrink-0 w-24">
+                           {match.status === 'FINISHED' || match.status === 'LIVE' ? (
+                              <div className="bg-[#ccff00] text-black px-4 py-1.5 rounded-sm font-black text-lg">
+                                 {match.homeScore} : {match.awayScore}
+                              </div>
+                           ) : (
+                              <div className="bg-gray-800 text-gray-400 px-3 py-1.5 rounded-sm font-bold text-xs uppercase tracking-widest">
+                                 {new Date(match.kickoff).toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' })}
+                              </div>
+                           )}
+                           <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-2">{new Date(match.kickoff).toLocaleDateString('uk-UA')}</span>
+                        </div>
+                        
+                        <div className="flex items-center gap-4 w-full sm:w-1/3">
+                           <div className="w-8 h-8 shrink-0 bg-[#0a0a0a] rounded-sm flex items-center justify-center p-1 border border-gray-800">
+                              {match.awayTeam?.logo ? <Image src={match.awayTeam.logo} alt={match.awayTeam?.name} width={24} height={24} className="object-contain" /> : <Shield className="w-4 h-4 text-gray-700" />}
+                           </div>
+                           <div className="text-left w-full">
+                              <p className="font-bold text-white text-sm uppercase tracking-wider truncate">{match.awayTeam?.name || 'TBD'}</p>
+                           </div>
+                        </div>
+                      </div>
+                    ))}
+                 </div>
+               </section>
+            )}
+
+          </div>
+
+          {/* Right Sidebar */}
+          <div className="w-full lg:w-80 shrink-0 space-y-6">
+            {(isCoach || tournament.status === 'REGISTRATION') && (
+              <TournamentApplicationBlock 
+                tournamentId={tournament.id}
+                tournamentStatus={tournament.status}
+                applicationStatus={appStatusObj.status}
+                appId={appStatusObj.appId}
+                hasTeam={appStatusObj.hasTeam}
+                isCoach={isCoach}
+                teamName={coachTeamName}
+              />
+            )}
+            
+            <div className="bg-[#111111] border border-gray-800 rounded-sm p-6">
+               <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest mb-4">Деталі</h3>
+               <div className="space-y-4 text-sm font-medium text-gray-300">
+                  <div className="flex justify-between border-b border-gray-800 pb-2">
+                     <span className="text-gray-500">Реєстрація до:</span>
+                     <span>{new Date(tournament.registrationDeadline).toLocaleDateString('uk-UA')}</span>
+                  </div>
+                  <div className="flex justify-between border-b border-gray-800 pb-2">
+                     <span className="text-gray-500">Формат:</span>
+                     <span>11 x 11</span>
+                  </div>
+                  <div className="flex justify-between border-b border-gray-800 pb-2">
+                     <span className="text-gray-500">Організатор:</span>
+                     <span>Footballium</span>
+                  </div>
+               </div>
+            </div>
+          </div>
+          
+        </div>
       </div>
     </div>
   )

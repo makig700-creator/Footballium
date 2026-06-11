@@ -79,7 +79,7 @@ export default async function TeamProfilePage({ params }: { params: Promise<{ id
                   {player.number}
                 </div>
                 <div className="overflow-hidden">
-                  <h4 className="font-bold text-white uppercase tracking-wider group-hover:text-[#CCFF00] transition-colors truncate">{player.name}</h4>
+                  <h4 className="font-bold text-white uppercase tracking-wider group-hover:text-[#CCFF00] transition-colors truncate">{player.firstName} {player.lastName}</h4>
                   <div className="flex items-center gap-2 mt-1">
                     <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-sm border border-gray-700 text-gray-400 uppercase tracking-widest">
                       {formatPosition(player.position)}

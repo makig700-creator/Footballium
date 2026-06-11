@@ -28,16 +28,31 @@ export async function POST(req: NextRequest, props: { params: Promise<{ id: stri
   try {
     const session = await auth();
     const role = (session?.user as any)?.role;
-    const teamId = (session?.user as any)?.teamId;
+    const userId = session?.user?.id;
 
-    if (!session || role !== "COACH" || !teamId) {
-      return new NextResponse("Unauthorized. Must be a coach of a team.", { status: 403 });
+    if (!session || role !== "COACH" || !userId) {
+      return new NextResponse("Unauthorized. Must be a coach.", { status: 403 });
+    }
+
+    const team = await prisma.team.findUnique({
+      where: { coachId: userId },
+    });
+
+    if (!team) {
+      return new NextResponse("Must create a team first.", { status: 400 });
     }
 
     const params = await props.params;
 
     const tournament = await prisma.tournament.findUnique({
       where: { id: params.id },
+      include: {
+        _count: {
+          select: {
+            teams: { where: { status: "APPROVED" } }
+          }
+        }
+      }
     });
 
     if (!tournament) {
@@ -48,29 +63,42 @@ export async function POST(req: NextRequest, props: { params: Promise<{ id: stri
       return new NextResponse("Tournament is not open for registration", { status: 400 });
     }
 
+    if (tournament._count.teams >= tournament.maxTeams) {
+      return new NextResponse("Tournament has reached maximum capacity", { status: 400 });
+    }
+
     const existingApplication = await prisma.tournamentTeam.findUnique({
       where: {
         tournamentId_teamId: {
           tournamentId: params.id,
-          teamId,
+          teamId: team.id,
         },
       },
     });
 
     if (existingApplication) {
+      if (existingApplication.status === "REJECTED") {
+        // Дозволити подати знову, оновивши статус на PENDING
+        const updated = await prisma.tournamentTeam.update({
+          where: { id: existingApplication.id },
+          data: { status: "PENDING", appliedAt: new Date() }
+        });
+        return NextResponse.json(updated, { status: 200 });
+      }
       return new NextResponse("Team has already applied to this tournament", { status: 400 });
     }
 
     const application = await prisma.tournamentTeam.create({
       data: {
         tournamentId: params.id,
-        teamId,
+        teamId: team.id,
         status: "PENDING",
       },
     });
 
     return NextResponse.json(application, { status: 201 });
   } catch (error) {
+    console.error(error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }

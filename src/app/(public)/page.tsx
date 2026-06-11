@@ -1,17 +1,33 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { prisma } from '@/lib/prisma'
+import { auth } from '@/lib/auth'
 import { Calendar, MapPin, Users, Flag, Trophy, Shield, Activity } from 'lucide-react'
+import { TournamentActionButtons } from '@/components/tournaments/tournament-action-buttons'
+import { getApplicationStatus } from '@/lib/tournament-utils'
 
 export const revalidate = 60 // Revalidate every minute
 
 export default async function HomePage() {
-  const [liveMatches] = await Promise.all([
+  const session = await auth()
+  const [liveMatches, tournaments] = await Promise.all([
     prisma.match.findMany({
       where: { status: 'LIVE' },
       include: { homeTeam: true, awayTeam: true },
     }),
+    prisma.tournament.findMany({
+      take: 3,
+      orderBy: { createdAt: 'desc' }
+    })
   ])
+
+  const user = session?.user as any
+  const isCoach = user?.role === 'COACH'
+  const userId = user?.id
+
+  const statuses = isCoach && userId ? await Promise.all(
+    tournaments.map(t => getApplicationStatus(t.id, userId))
+  ) : []
 
   return (
     <div className="flex flex-col min-h-screen bg-[#000000] text-gray-200 font-sans selection:bg-[#ccff00] selection:text-black">
@@ -102,115 +118,77 @@ export default async function HomePage() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Tournament Card 1 - ZT */}
-            <div className="bg-[#1c1a1a] border border-[#2a2828] rounded-md p-6 flex flex-col relative group hover:border-gray-600 transition-colors">
-              <div className="absolute top-4 right-4 border border-gray-500 text-gray-400 px-2 py-0.5 text-[10px] font-black uppercase tracking-widest rounded-sm">
-                FINISHED
+            {tournaments.length === 0 ? (
+              <div className="col-span-1 md:col-span-3 text-center py-12 text-gray-500">
+                <Trophy className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                <p className="font-bold uppercase tracking-widest text-sm">Наразі немає активних турнірів</p>
               </div>
-              
-              <div className="h-40 flex items-center justify-center mb-6 mt-4">
-                 <Trophy className="w-24 h-24 text-gray-400 drop-shadow-[0_0_15px_rgba(156,163,175,0.2)] group-hover:scale-110 transition-transform duration-500" />
-              </div>
-              
-              <h3 className="text-lg font-bold text-white mb-6 uppercase leading-snug">ЧЕМПІОНАТ ЖО м. ЖИТОМИР (ЕД)</h3>
-              
-              <div className="space-y-3 mb-8 text-xs text-gray-400 font-medium tracking-wide">
-                <div className="flex items-center gap-3">
-                  <Calendar className="w-4 h-4 text-gray-500" /> 19 Жов 2025 - 08 Бер 2026
-                </div>
-                <div className="flex items-center gap-3">
-                  <Users className="w-4 h-4 text-gray-500" /> 10 Команд
-                </div>
-                <div className="flex items-center gap-3 text-amber-500 font-bold">
-                  <Trophy className="w-4 h-4" /> 1 місце — Енергія
-                </div>
-              </div>
-              
-              <div className="mt-auto">
-                 <div className="flex gap-2">
-                    <Link href="/tournaments/tournament-zhytomyr" className="flex-1 py-3 text-center border border-gray-700 hover:border-white text-white font-extrabold uppercase text-[11px] tracking-widest transition-colors rounded-sm bg-[#0a0a0a]">
-                      Переглянути
-                    </Link>
-                 </div>
-              </div>
-            </div>
+            ) : (
+              tournaments.map((tournament, idx) => {
+                const appStatus = statuses[idx] || { status: null, hasTeam: false }
+                
+                // Colors and badges based on status
+                let badgeColor = "border-gray-500 text-gray-400"
+                let trophyColor = "text-gray-400 drop-shadow-[0_0_15px_rgba(156,163,175,0.2)]"
+                let badgeText = tournament.status
 
-            {/* Tournament Card 2 */}
-            <div className="bg-[#1c1a1a] border border-[#2a2828] rounded-md p-6 flex flex-col relative group hover:border-gray-600 transition-colors">
-              <div className="absolute top-4 right-4 border border-green-500 text-green-500 px-2 py-0.5 text-[10px] font-black uppercase tracking-widest rounded-sm">
-                Відкрито
-              </div>
-              
-              <div className="h-40 flex items-center justify-center mb-6 mt-4">
-                 <Trophy className="w-24 h-24 text-[#ccff00] drop-shadow-[0_0_15px_rgba(204,255,0,0.2)] group-hover:scale-110 transition-transform duration-500" />
-              </div>
-              
-              <h3 className="text-lg font-bold text-white mb-6 uppercase leading-snug">Літній Кубок Незалежності 2026.</h3>
-              
-              <div className="space-y-3 mb-8 text-xs text-gray-400 font-medium tracking-wide">
-                <div className="flex items-center gap-3">
-                  <Calendar className="w-4 h-4 text-gray-500" /> Серпень 24, 2026
-                </div>
-                <div className="flex items-center gap-3">
-                  <MapPin className="w-4 h-4 text-gray-500" /> НТК Баннікова, Київ
-                </div>
-                <div className="flex items-center gap-3">
-                  <Users className="w-4 h-4 text-gray-500" /> 4 Дивізіони (11x11)
-                </div>
-              </div>
-              
-              <div className="mt-auto">
-                 <div className="flex justify-between items-center mb-4 pb-4 border-b border-[#2a2828]">
-                    <div className="text-[10px] text-gray-500 uppercase tracking-wider">Внесок:</div>
-                    <div className="text-xs text-white font-bold">25,000 ₴</div>
-                 </div>
-                 <div className="flex gap-2">
-                    <Link href="/tournaments/independence-cup" className="flex-1 py-3 text-center bg-[#ccff00] hover:bg-[#b3ff00] text-black font-extrabold uppercase text-[11px] tracking-widest transition-colors rounded-sm">
-                      Заявитися
-                    </Link>
-                    <button className="px-4 py-3 border border-gray-700 hover:border-gray-500 text-white font-extrabold uppercase text-[11px] tracking-widest transition-colors rounded-sm">
-                      Деталі
-                    </button>
-                 </div>
-              </div>
-            </div>
+                if (tournament.status === 'REGISTRATION') {
+                  badgeColor = "border-green-500 text-green-500"
+                  badgeText = "Відкрито"
+                  trophyColor = "text-[#ccff00] drop-shadow-[0_0_15px_rgba(204,255,0,0.2)]"
+                } else if (tournament.status === 'ONGOING') {
+                  badgeColor = "border-blue-500 text-blue-500"
+                  badgeText = "Триває"
+                  trophyColor = "text-blue-500 drop-shadow-[0_0_15px_rgba(59,130,246,0.2)]"
+                } else if (tournament.status === 'DRAFT') {
+                  badgeColor = "border-gray-600 text-gray-500"
+                  badgeText = "Незабаром"
+                }
 
-            {/* Tournament Card 3 */}
-            <div className="bg-[#1c1a1a] border border-[#2a2828] rounded-md p-6 flex flex-col relative group hover:border-gray-600 transition-colors opacity-80 grayscale hover:grayscale-0">
-              <div className="absolute top-4 right-4 border border-gray-600 text-gray-500 px-2 py-0.5 text-[10px] font-black uppercase tracking-widest rounded-sm">
-                Незабаром
-              </div>
-              
-              <div className="h-40 flex items-center justify-center mb-6 mt-4">
-                 <Trophy className="w-24 h-24 text-blue-500 drop-shadow-[0_0_15px_rgba(59,130,246,0.2)] group-hover:scale-110 transition-transform duration-500" />
-              </div>
-              
-              <h3 className="text-lg font-bold text-white mb-6 uppercase leading-snug">Зимова першість столиці 2026.</h3>
-              
-              <div className="space-y-3 mb-8 text-xs text-gray-400 font-medium tracking-wide">
-                <div className="flex items-center gap-3">
-                  <Calendar className="w-4 h-4 text-gray-500" /> Грудень 10, 2026
-                </div>
-                <div className="flex items-center gap-3">
-                  <MapPin className="w-4 h-4 text-gray-500" /> Очікується
-                </div>
-                <div className="flex items-center gap-3">
-                  <Users className="w-4 h-4 text-gray-500" /> 8 Дивізіонів (5x5)
-                </div>
-              </div>
-              
-              <div className="mt-auto">
-                 <div className="flex justify-between items-center mb-4 pb-4 border-b border-[#2a2828]">
-                    <div className="text-[10px] text-gray-500 uppercase tracking-wider">Внесок:</div>
-                    <div className="text-xs text-gray-500 font-bold">Очікується</div>
-                 </div>
-                 <div className="flex gap-2">
-                    <button disabled className="flex-1 py-3 text-center bg-gray-800 text-gray-600 font-extrabold uppercase text-[11px] tracking-widest rounded-sm cursor-not-allowed">
-                      Очікується
-                    </button>
-                 </div>
-              </div>
-            </div>
+                return (
+                  <div key={tournament.id} className={`bg-[#1c1a1a] border border-[#2a2828] rounded-md p-6 flex flex-col relative group hover:border-gray-600 transition-colors ${tournament.status === 'DRAFT' ? 'opacity-80 grayscale hover:grayscale-0' : ''}`}>
+                    <div className={`absolute top-4 right-4 border px-2 py-0.5 text-[10px] font-black uppercase tracking-widest rounded-sm ${badgeColor}`}>
+                      {badgeText}
+                    </div>
+                    
+                    <div className="h-40 flex items-center justify-center mb-6 mt-4">
+                       {tournament.logo ? (
+                         <div className="relative w-24 h-24">
+                           <Image src={tournament.logo} alt={tournament.name} fill className="object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.1)] group-hover:scale-110 transition-transform duration-500" />
+                         </div>
+                       ) : (
+                         <Trophy className={`w-24 h-24 ${trophyColor} group-hover:scale-110 transition-transform duration-500`} />
+                       )}
+                    </div>
+                    
+                    <h3 className="text-lg font-bold text-white mb-6 uppercase leading-snug">{tournament.name}</h3>
+                    
+                    <div className="space-y-3 mb-8 text-xs text-gray-400 font-medium tracking-wide">
+                      <div className="flex items-center gap-3">
+                        <Calendar className="w-4 h-4 text-gray-500" /> {new Date(tournament.startDate).toLocaleDateString('uk-UA')}
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Users className="w-4 h-4 text-gray-500" /> До {tournament.maxTeams} Команд
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Shield className="w-4 h-4 text-gray-500" /> {tournament.bracketType.replace('_', ' ')}
+                      </div>
+                    </div>
+                    
+                    <div className="mt-auto">
+                       <TournamentActionButtons 
+                         tournamentId={tournament.id}
+                         tournamentStatus={tournament.status}
+                         applicationStatus={appStatus.status}
+                         hasTeam={appStatus.hasTeam}
+                         isCoach={isCoach}
+                         compact={true}
+                       />
+                    </div>
+                  </div>
+                )
+              })
+            )}
             
           </div>
           

@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 
-type Player = { id: string; name: string; position: string; number: number }
+type Player = { id: string; firstName: string; lastName: string; position: string; number: number }
 
 export function LineupBuilder({
   matchId,
@@ -135,7 +135,7 @@ export function LineupBuilder({
                   <option value="">Оберіть гравця...</option>
                   {players.map((p) => (
                     <option key={p.id} value={p.id}>
-                      #{p.number} {p.name} ({formatPosition(p.position)})
+                      #{p.number} {p.firstName} {p.lastName} ({formatPosition(p.position)})
                     </option>
                   ))}
                 </select>
@@ -179,7 +179,7 @@ export function LineupBuilder({
                   <option value="">Оберіть запасного...</option>
                   {players.map((p) => (
                     <option key={p.id} value={p.id}>
-                      #{p.number} {p.name} ({formatPosition(p.position)})
+                      #{p.number} {p.firstName} {p.lastName} ({formatPosition(p.position)})
                     </option>
                   ))}
                 </select>

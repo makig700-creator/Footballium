@@ -36,8 +36,12 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
         
         <div className="relative z-20 p-8 sm:p-12 flex flex-col md:flex-row items-center md:items-start gap-12">
           <div className="relative">
-            <div className="w-32 h-32 md:w-40 md:h-40 rounded-sm bg-[#0a0a0a] border border-gray-800 flex items-center justify-center overflow-hidden shrink-0 shadow-2xl">
-              <User className="w-16 h-16 text-gray-700" />
+            <div className="w-32 h-32 md:w-40 md:h-40 rounded-sm bg-[#0a0a0a] border border-gray-800 flex items-center justify-center overflow-hidden shrink-0 shadow-2xl relative">
+              {player.photo ? (
+                <Image src={player.photo} alt={`${player.firstName} ${player.lastName}`} fill className="object-cover" />
+              ) : (
+                <User className="w-16 h-16 text-gray-700" />
+              )}
             </div>
             <div className="absolute -bottom-4 -right-4 w-14 h-14 rounded-sm bg-[#CCFF00] border border-[#000000] p-1 flex items-center justify-center shadow-lg">
               {player.team.logo && <Image src={player.team.logo} alt={player.team.name} width={36} height={36} className="object-contain" />}
@@ -46,7 +50,7 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
           
           <div className="text-center md:text-left flex-1 mt-4 md:mt-0">
             <div className="flex flex-col md:flex-row md:items-center gap-4 mb-8">
-              <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight uppercase">{player.name}</h1>
+              <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight uppercase">{player.firstName} {player.lastName}</h1>
               <span className="text-[10px] font-black px-2 py-1 rounded-sm border border-[#CCFF00] text-[#CCFF00] uppercase tracking-widest md:ml-2">
                 {formatPosition(player.position)}
               </span>

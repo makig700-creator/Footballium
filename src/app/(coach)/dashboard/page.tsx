@@ -15,24 +15,32 @@ export default async function DashboardPage() {
 
   const user = session.user as any
   
-  if (user.role !== 'COACH' || !user.teamId) {
+  if (user.role !== 'COACH') {
     return (
       <div className="flex flex-col items-center justify-center h-[60vh] text-center">
         <AlertCircle className="w-16 h-16 text-red-500 mb-4" />
         <h1 className="text-2xl font-black text-white uppercase tracking-widest mb-2">Доступ заборонено</h1>
-        <p className="text-gray-400 font-bold text-xs uppercase tracking-widest">У вас немає прав тренера або ви не закріплені за жодною командою.</p>
+        <p className="text-gray-400 font-bold text-xs uppercase tracking-widest">У вас немає прав тренера.</p>
       </div>
     )
   }
 
   const team = await prisma.team.findUnique({
-    where: { id: user.teamId },
+    where: { coachId: user.id },
     include: {
       _count: { select: { players: true } }
     }
   })
 
-  if (!team) return null
+  if (!team) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[60vh] text-center">
+        <AlertCircle className="w-16 h-16 text-red-500 mb-4" />
+        <h1 className="text-2xl font-black text-white uppercase tracking-widest mb-2">Команду не знайдено</h1>
+        <p className="text-gray-400 font-bold text-xs uppercase tracking-widest">Ви не закріплені за жодною командою. Зверніться до адміністратора.</p>
+      </div>
+    )
+  }
 
   const upcomingMatches = await prisma.match.findMany({
     where: {
