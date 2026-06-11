@@ -469,16 +469,16 @@ async function main() {
 
     // Add standings
     const standingsRaw = [
-      { team: "Енергія",               played: 18, won: 15, drawn: 2, lost: 1, goalsFor: 101, goalsAgainst: 34, points: 47 },
-      { team: 'ФК "ГУНП-ІВАНКІВ" (Житомир)',       played: 18, won: 13, drawn: 3, lost: 2, goalsFor: 77,  goalsAgainst: 35, points: 42 },
-      { team: "ФзК Форца",             played: 18, won: 13, drawn: 1, lost: 4, goalsFor: 53,  goalsAgainst: 34, points: 40 },
-      { team: 'ФК "VIVAD" (Романів)',              played: 18, won: 12, drawn: 2, lost: 4, goalsFor: 76,  goalsAgainst: 35, points: 38 },
-      { team: 'СК "Форсаж"',             played: 18, won: 9,  drawn: 1, lost: 8, goalsFor: 52,  goalsAgainst: 45, points: 28 },
-      { team: 'ФК "Рятівник"',           played: 18, won: 7,  drawn: 3, lost: 8, goalsFor: 50,  goalsAgainst: 52, points: 24 },
+      { team: "Енергія", played: 18, won: 15, drawn: 2, lost: 1, goalsFor: 101, goalsAgainst: 34, points: 47 },
+      { team: 'ФК "ГУНП-ІВАНКІВ" (Житомир)', played: 18, won: 13, drawn: 3, lost: 2, goalsFor: 77, goalsAgainst: 35, points: 42 },
+      { team: "ФзК Форца", played: 18, won: 13, drawn: 1, lost: 4, goalsFor: 53, goalsAgainst: 34, points: 40 },
+      { team: 'ФК "VIVAD" (Романів)', played: 18, won: 12, drawn: 2, lost: 4, goalsFor: 76, goalsAgainst: 35, points: 38 },
+      { team: 'СК "Форсаж"', played: 18, won: 9, drawn: 1, lost: 8, goalsFor: 52, goalsAgainst: 45, points: 28 },
+      { team: 'ФК "Рятівник"', played: 18, won: 7, drawn: 3, lost: 8, goalsFor: 50, goalsAgainst: 52, points: 24 },
       { team: "Житомирська політехніка", played: 18, won: 3, drawn: 3, lost: 12, goalsFor: 26, goalsAgainst: 71, points: 12 },
-      { team: "INVIVO",                played: 18, won: 3,  drawn: 1, lost: 14, goalsFor: 31, goalsAgainst: 87, points: 10 },
-      { team: "QOOBIX",                played: 18, won: 3,  drawn: 1, lost: 14, goalsFor: 32, goalsAgainst: 72, points: 10 },
-      { team: "ЖВІ ім. Корольова",     played: 18, won: 3,  drawn: 1, lost: 14, goalsFor: 27, goalsAgainst: 60, points: 10 },
+      { team: "INVIVO", played: 18, won: 3, drawn: 1, lost: 14, goalsFor: 31, goalsAgainst: 87, points: 10 },
+      { team: "QOOBIX", played: 18, won: 3, drawn: 1, lost: 14, goalsFor: 32, goalsAgainst: 72, points: 10 },
+      { team: "ЖВІ ім. Корольова", played: 18, won: 3, drawn: 1, lost: 14, goalsFor: 27, goalsAgainst: 60, points: 10 },
     ];
 
     for (const s of standingsRaw) {
@@ -502,7 +502,7 @@ async function main() {
         });
       }
     }
-    
+
     console.log('✅ Zhytomyr Tournament & Standings created')
   }
   console.log('🎉 Database seeded successfully!')
