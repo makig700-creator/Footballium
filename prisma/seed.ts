@@ -112,18 +112,20 @@ async function main() {
   ]
 
   for (const p of arsenalPlayers) {
+    const { name, ...playerData } = p;
     await prisma.player.upsert({
       where: { id: p.id },
       update: {},
-      create: { ...p, teamId: arsenal.id },
+      create: { ...playerData, firstName: name.split(' ')[0], lastName: name.split(' ').slice(1).join(' '), teamId: arsenal.id },
     })
   }
 
   for (const p of chelseaPlayers) {
+    const { name, ...playerData } = p;
     await prisma.player.upsert({
       where: { id: p.id },
       update: {},
-      create: { ...p, teamId: chelsea.id },
+      create: { ...playerData, firstName: name.split(' ')[0], lastName: name.split(' ').slice(1).join(' '), teamId: chelsea.id },
     })
   }
 
@@ -409,7 +411,8 @@ async function main() {
         update: {},
         create: {
           id: `p-${team.id}-${i}`,
-          name: players[i],
+          firstName: players[i].split(' ')[1] || players[i],
+          lastName: players[i].split(' ')[0] || '',
           position: i === 0 ? Position.GK : Position.MID,
           number: i + 1,
           nationality: 'Ukraine',

@@ -50,7 +50,7 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
           
           <div className="text-center md:text-left flex-1 mt-4 md:mt-0">
             <div className="flex flex-col md:flex-row md:items-center gap-4 mb-8">
-              <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight uppercase">{player.name}</h1>
+              <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight uppercase">{player.firstName} {player.lastName}</h1>
               <span className="text-[10px] font-black px-2 py-1 rounded-sm border border-[#CCFF00] text-[#CCFF00] uppercase tracking-widest md:ml-2">
                 {formatPosition(player.position)}
               </span>

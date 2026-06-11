@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { prisma } from '@/lib/prisma'
+import { auth } from '@/lib/auth'
 import { Calendar, MapPin, Users, Flag, Trophy, Shield, Activity } from 'lucide-react'
 import { TournamentActionButtons } from '@/components/tournaments/tournament-action-buttons'
 import { getApplicationStatus } from '@/lib/tournament-utils'
