@@ -68,9 +68,11 @@ export default async function HomePage() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 pt-6">
-              <Link href="/auth/register" className="inline-flex justify-center items-center px-8 py-3.5 bg-[#ccff00] hover:bg-white text-black font-extrabold uppercase text-sm tracking-widest transition-all">
-                Долучитися
-              </Link>
+              {!session && (
+                <Link href="/auth/register" className="inline-flex justify-center items-center px-8 py-3.5 bg-[#ccff00] hover:bg-white text-black font-extrabold uppercase text-sm tracking-widest transition-all">
+                  Долучитися
+                </Link>
+              )}
               <Link href="/tournaments" className="inline-flex justify-center items-center px-8 py-3.5 border border-gray-600 hover:border-[#ccff00] text-[#ccff00] font-extrabold uppercase text-sm tracking-widest transition-all bg-black/50 backdrop-blur-sm">
                 Знайти турнір
               </Link>
