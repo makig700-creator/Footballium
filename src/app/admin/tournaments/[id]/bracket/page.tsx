@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma"
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
+import { RefereeSelect } from "./referee-select"
 
 export default async function TournamentBracketPage(props: { params: Promise<{ id: string }> }) {
   const session = await auth()
@@ -21,11 +22,17 @@ export default async function TournamentBracketPage(props: { params: Promise<{ i
     include: {
       homeTeam: true,
       awayTeam: true,
+      referee: true,
     },
     orderBy: [
       { round: 'asc' },
       { matchNumber: 'asc' }
     ]
+  })
+
+  const referees = await prisma.user.findMany({
+    where: { role: "REFEREE" },
+    select: { id: true, name: true }
   })
 
   // Group matches by round
@@ -80,10 +87,16 @@ export default async function TournamentBracketPage(props: { params: Promise<{ i
                       {match.awayScore ?? "-"}
                     </span>
                   </div>
-                  {match.status === "FINISHED" && (
+                  {match.status === "FINISHED" ? (
                     <div className="mt-2 text-[10px] text-center text-gray-600 uppercase">
                       Завершено
                     </div>
+                  ) : (
+                    <RefereeSelect 
+                      matchId={match.id} 
+                      currentRefereeId={match.refereeId} 
+                      referees={referees} 
+                    />
                   )}
                 </div>
               ))}

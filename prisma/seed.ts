@@ -1,10 +1,8 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, MatchStatus, EventType } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
 const Position = { GK: 'GK', DEF: 'DEF', MID: 'MID', FWD: 'FWD' }
-const MatchStatus = { SCHEDULED: 'SCHEDULED', LIVE: 'LIVE', FULLTIME: 'FULLTIME', POSTPONED: 'POSTPONED' }
-const EventType = { GOAL: 'GOAL', YELLOW_CARD: 'YELLOW_CARD', RED_CARD: 'RED_CARD', SUBSTITUTION: 'SUBSTITUTION', OWN_GOAL: 'OWN_GOAL', PENALTY: 'PENALTY' }
-const Role = { ADMIN: 'ADMIN', COACH: 'COACH', VIEWER: 'VIEWER' }
+const Role = { ADMIN: 'ADMIN', COACH: 'COACH', VIEWER: 'VIEWER', REFEREE: 'REFEREE' }
 
 const prisma = new PrismaClient()
 
@@ -187,7 +185,7 @@ async function main() {
       awayTeamId: chelsea.id,
       homeScore: 2,
       awayScore: 1,
-      status: MatchStatus.FULLTIME,
+      status: MatchStatus.FINISHED,
       kickoff: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000),
       venue: 'Emirates Stadium',
       season: '2024/25',
@@ -251,12 +249,12 @@ async function main() {
 
   // ── Match Events ──────────────────────────────────────────────────────────
   const eventsData = [
-    { id: 'evt-1', matchId: match1.id, type: EventType.GOAL, minute: 23, teamId: arsenal.id, playerId: 'p-ars-9', playerName: 'Bukayo Saka', detail: 'Right foot shot' },
-    { id: 'evt-2', matchId: match1.id, type: EventType.GOAL, minute: 55, teamId: arsenal.id, playerId: 'p-ars-10', playerName: 'Gabriel Martinelli', detail: 'Header' },
-    { id: 'evt-3', matchId: match1.id, type: EventType.YELLOW_CARD, minute: 38, teamId: chelsea.id, playerId: 'p-che-6', playerName: 'Moisés Caicedo', detail: 'Tactical foul' },
-    { id: 'evt-4', matchId: match1.id, type: EventType.GOAL, minute: 78, teamId: chelsea.id, playerId: 'p-che-9', playerName: 'Nicolas Jackson', detail: 'Penalty' },
-    { id: 'evt-5', matchId: liveMatch.id, type: EventType.GOAL, minute: 34, teamId: liverpool.id, playerName: 'Mohamed Salah', detail: 'Left foot finish' },
-    { id: 'evt-6', matchId: liveMatch.id, type: EventType.YELLOW_CARD, minute: 52, teamId: manCity.id, playerName: 'Rodri', detail: 'Late challenge' },
+    { id: 'evt-1', matchId: match1.id, type: EventType.GOAL, minute: 23, teamId: arsenal.id, playerId: 'p-ars-9', comment: 'Bukayo Saka - Right foot shot' },
+    { id: 'evt-2', matchId: match1.id, type: EventType.GOAL, minute: 55, teamId: arsenal.id, playerId: 'p-ars-10', comment: 'Gabriel Martinelli - Header' },
+    { id: 'evt-3', matchId: match1.id, type: EventType.YELLOW_CARD, minute: 38, teamId: chelsea.id, playerId: 'p-che-6', comment: 'Moisés Caicedo - Tactical foul' },
+    { id: 'evt-4', matchId: match1.id, type: EventType.PENALTY_GOAL, minute: 78, teamId: chelsea.id, playerId: 'p-che-9', comment: 'Nicolas Jackson - Penalty' },
+    { id: 'evt-5', matchId: liveMatch.id, type: EventType.GOAL, minute: 34, teamId: liverpool.id, comment: 'Mohamed Salah - Left foot finish' },
+    { id: 'evt-6', matchId: liveMatch.id, type: EventType.YELLOW_CARD, minute: 52, teamId: manCity.id, comment: 'Rodri - Late challenge' },
   ]
   for (const evt of eventsData) {
     await prisma.matchEvent.upsert({ where: { id: evt.id }, update: {}, create: evt })
@@ -418,13 +416,8 @@ async function main() {
         update: {},
         create: {
           id: `p-${team.id}-${i}`,
-<<<<<<< HEAD
-          firstName: players[i].split(' ')[1] || players[i],
-          lastName: players[i].split(' ')[0] || '',
-=======
           firstName,
           lastName,
->>>>>>> feature/team
           position: i === 0 ? Position.GK : Position.MID,
           number: i + 1,
           nationality: 'Ukraine',
