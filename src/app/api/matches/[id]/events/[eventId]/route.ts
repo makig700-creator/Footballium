@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { pusherServer } from "@/lib/pusher";
 import { EventType } from "@prisma/client";
+import { recalculateMatchStats, recalculateStandings, recalculatePlayerStats } from "@/lib/stats-calculator";
 
 export async function DELETE(
   request: Request,
@@ -35,38 +36,34 @@ export async function DELETE(
       return NextResponse.json({ error: "Event not found" }, { status: 404 });
     }
 
-    // Rollback score if it was a goal
-    let homeScore = match.homeScore || 0;
-    let awayScore = match.awayScore || 0;
-    let scoreChanged = false;
-
-    if (event.type === EventType.GOAL || event.type === EventType.PENALTY_GOAL) {
-      if (event.teamId === match.homeTeamId) {
-        homeScore = Math.max(0, homeScore - 1);
-        scoreChanged = true;
-      } else if (event.teamId === match.awayTeamId) {
-        awayScore = Math.max(0, awayScore - 1);
-        scoreChanged = true;
-      }
-    } else if (event.type === EventType.OWN_GOAL) {
-      if (event.teamId === match.homeTeamId) {
-        awayScore = Math.max(0, awayScore - 1);
-        scoreChanged = true;
-      } else if (event.teamId === match.awayTeamId) {
-        homeScore = Math.max(0, homeScore - 1);
-        scoreChanged = true;
-      }
-    }
-
     await prisma.matchEvent.delete({
       where: { id: (await params).eventId },
     });
 
-    let updatedMatch = match;
-    if (scoreChanged) {
-      updatedMatch = await prisma.match.update({
-        where: { id: matchId },
-        data: { homeScore, awayScore },
+    // Update match score using stats calculator
+    await recalculateMatchStats(matchId);
+    
+    const updatedMatch = await prisma.match.findUnique({
+      where: { id: matchId },
+    }) || match;
+
+    if (updatedMatch.tournamentId) {
+      await recalculateStandings(updatedMatch.tournamentId);
+      if (event.playerId) {
+        await recalculatePlayerStats(event.playerId, updatedMatch.tournamentId);
+      }
+      
+      const updatedStandings = await prisma.tournamentStanding.findMany({
+        where: { tournamentId: updatedMatch.tournamentId },
+        orderBy: [
+          { points: 'desc' },
+          { goalDiff: 'desc' },
+          { goalsFor: 'desc' }
+        ],
+        include: { team: true }
+      });
+      await pusherServer.trigger(`tournament-${updatedMatch.tournamentId}`, 'standings-updated', {
+        standings: updatedStandings
       });
     }
 

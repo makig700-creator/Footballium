@@ -46,6 +46,8 @@ model Tournament {
   createdBy            User             @relation(fields: [createdById], references: [id])
   teams                TournamentTeam[]
   matches              Match[]
+  standings            TournamentStanding[]
+  playerStats          PlayerStats[]
   createdAt            DateTime         @default(now())
 }
 
@@ -130,8 +132,8 @@ model Team {
   coaches      User[]           @relation("UserTeam")
   homeMatches  Match[]          @relation("HomeTeam")
   awayMatches  Match[]          @relation("AwayTeam")
-  standings    Standings[]
-  tournaments  TournamentTeam[]
+  tournamentStandings TournamentStanding[]
+  tournaments         TournamentTeam[]
   coachId      String?          @unique
   coach        User?            @relation("TeamCoach", fields: [coachId], references: [id])
   createdAt    DateTime         @default(now())
@@ -151,7 +153,7 @@ model Player {
   photo       String?
   teamId      String
   team        Team         @relation(fields: [teamId], references: [id])
-  stats       PlayerStats?
+  stats       PlayerStats[]
   lineupSlots LineupSlot[]
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
@@ -160,17 +162,20 @@ model Player {
 }
 
 model PlayerStats {
-  id            String @id @default(cuid())
-  playerId      String @unique
-  player        Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
-  appearances   Int    @default(0)
-  goals         Int    @default(0)
-  assists       Int    @default(0)
-  yellowCards   Int    @default(0)
-  redCards      Int    @default(0)
-  minutesPlayed Int    @default(0)
-  cleanSheets   Int    @default(0)
-  rating        Float  @default(0)
+  id            String     @id @default(cuid())
+  playerId      String
+  tournamentId  String
+  goals         Int        @default(0)
+  ownGoals      Int        @default(0)
+  yellowCards   Int        @default(0)
+  redCards      Int        @default(0)
+  matchesPlayed Int        @default(0)
+  minutesPlayed Int        @default(0)
+  updatedAt     DateTime   @updatedAt
+  player        Player     @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  tournament    Tournament @relation(fields: [tournamentId], references: [id])
+
+  @@unique([playerId, tournamentId])
 }
 
 model Match {
@@ -251,20 +256,22 @@ model News {
   updatedAt   DateTime @updatedAt
 }
 
-model Standings {
-  id       String @id @default(cuid())
-  teamId   String
-  team     Team   @relation(fields: [teamId], references: [id])
-  season   String @default("2024/25")
-  leagueId String @default("premier-league")
-  played   Int    @default(0)
-  won      Int    @default(0)
-  drawn    Int    @default(0)
-  lost     Int    @default(0)
-  gf       Int    @default(0)
-  ga       Int    @default(0)
-  points   Int    @default(0)
-  form     String @default("")
+model TournamentStanding {
+  id             String     @id @default(cuid())
+  tournamentId   String
+  teamId         String
+  position       Int
+  played         Int        @default(0)
+  won            Int        @default(0)
+  drawn          Int        @default(0)
+  lost           Int        @default(0)
+  goalsFor       Int        @default(0)
+  goalsAgainst   Int        @default(0)
+  goalDiff       Int        @default(0)
+  points         Int        @default(0)
+  updatedAt      DateTime   @updatedAt
+  tournament     Tournament @relation(fields: [tournamentId], references: [id])
+  team           Team       @relation(fields: [teamId], references: [id])
 
-  @@unique([teamId, season, leagueId])
+  @@unique([tournamentId, teamId])
 }

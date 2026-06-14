@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { pusherServer } from "@/lib/pusher";
 import { MatchStatus } from "@prisma/client";
+import { recalculateStandings, recalculatePlayerStats } from "@/lib/stats-calculator";
 
 export async function POST(
   request: Request,
@@ -45,6 +46,33 @@ export async function POST(
       minute: updatedMatch.minute,
       events: updatedMatch.events,
     });
+
+    if (updatedMatch.tournamentId) {
+      await recalculateStandings(updatedMatch.tournamentId);
+
+      const lineup = await prisma.lineup.findUnique({
+        where: { matchId },
+        include: { slots: true }
+      });
+      if (lineup) {
+        for (const slot of lineup.slots) {
+          await recalculatePlayerStats(slot.playerId, updatedMatch.tournamentId);
+        }
+      }
+
+      const updatedStandings = await prisma.tournamentStanding.findMany({
+        where: { tournamentId: updatedMatch.tournamentId },
+        orderBy: [
+          { points: 'desc' },
+          { goalDiff: 'desc' },
+          { goalsFor: 'desc' }
+        ],
+        include: { team: true }
+      });
+      await pusherServer.trigger(`tournament-${updatedMatch.tournamentId}`, 'standings-updated', {
+        standings: updatedStandings
+      });
+    }
 
     return NextResponse.json(updatedMatch);
   } catch (error) {
