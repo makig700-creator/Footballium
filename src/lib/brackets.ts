@@ -10,7 +10,7 @@ export function generateRoundRobin(
 ): Omit<Match, "id" | "createdAt" | "updatedAt" | "minute" | "lineup" | "homeScore" | "awayScore" | "scheduledAt">[] {
   const matches: Omit<Match, "id" | "createdAt" | "updatedAt" | "minute" | "lineup" | "homeScore" | "awayScore" | "scheduledAt">[] = [];
   const numTeams = teams.length;
-  
+
   // If odd number of teams, add a dummy team for a "bye"
   const teamsWithBye = numTeams % 2 !== 0 ? [...teams, "BYE"] : [...teams];
   const totalRounds = teamsWithBye.length - 1;
@@ -58,7 +58,7 @@ export function generateSingleElimination(
 ): Omit<Match, "id" | "createdAt" | "updatedAt" | "minute" | "lineup" | "homeScore" | "awayScore" | "scheduledAt">[] {
   const matches: Omit<Match, "id" | "createdAt" | "updatedAt" | "minute" | "lineup" | "homeScore" | "awayScore" | "scheduledAt">[] = [];
   const numTeams = teams.length;
-  
+
   // Find next power of 2
   const nextPow2 = Math.pow(2, Math.ceil(Math.log2(numTeams)));
   const byes = nextPow2 - numTeams;
@@ -71,7 +71,7 @@ export function generateSingleElimination(
 
   // Shuffle teams (optional, but let's keep it sequential for now)
   // or simple pairing
-  
+
   // Generate first round matches
   const round = 1;
   let matchNumber = 1;

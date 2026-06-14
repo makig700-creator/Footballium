@@ -17,7 +17,7 @@ export default async function MatchesPage() {
       orderBy: { kickoff: 'asc' },
     }),
     prisma.match.findMany({
-      where: { status: 'FULLTIME' },
+      where: { status: 'FINISHED' },
       include: { homeTeam: true, awayTeam: true },
       orderBy: { kickoff: 'desc' },
       take: 10,

@@ -73,7 +73,7 @@ export function Navbar() {
                 {userMenuOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-[#0a0a0a] border border-gray-800 py-1 shadow-2xl z-50">
                     <Link
-                      href={(session.user as any)?.role === "ADMIN" ? "/admin/dashboard" : (session.user as any)?.role === "COACH" ? "/dashboard" : (session.user as any)?.role === "REFEREE" ? "/dashboard" : "/"}
+                      href={(session.user as any)?.role === "ADMIN" ? "/admin/dashboard" : (session.user as any)?.role === "COACH" ? "/dashboard" : (session.user as any)?.role === "REFEREE" ? "/referee/dashboard" : "/"}
                       onClick={() => setUserMenuOpen(false)}
                       className="flex items-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-wider text-gray-300 hover:text-[#CCFF00] hover:bg-gray-900 transition-colors"
                     >

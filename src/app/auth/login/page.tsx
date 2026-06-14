@@ -37,7 +37,7 @@ export default function LoginPage() {
         const roleRoutes: Record<string, string> = {
           ADMIN: "/admin/dashboard",
           COACH: "/dashboard",
-          REFEREE: "/dashboard",
+          REFEREE: "/referee/dashboard",
           USER: "/"
         };
         router.push(roleRoutes[role] || "/");

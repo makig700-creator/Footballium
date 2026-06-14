@@ -19,7 +19,7 @@ export type FixtureData = {
 
 export function FixtureCard({ match }: { match: FixtureData }) {
   const isLive = match.status === 'LIVE'
-  const isFinished = match.status === 'FULLTIME'
+  const isFinished = match.status === 'FINISHED'
 
   return (
     <Link href={`/matches/${match.id}`} className="block group">
