@@ -28,25 +28,34 @@ export default function LoginPage() {
         redirect: false,
       });
 
-      if (res?.ok) {
+      if (res?.ok && !res?.url?.includes("error=")) {
         // Fetch session to get the role
         const sessionRes = await fetch("/api/auth/session");
         const sessionData = await sessionRes.json();
         
-        const role = sessionData?.user?.role || "USER";
-        const roleRoutes: Record<string, string> = {
-          ADMIN: "/admin/dashboard",
-          COACH: "/dashboard",
-          REFEREE: "/referee/dashboard",
-          USER: "/"
-        };
-        router.push(roleRoutes[role] || "/");
-        router.refresh();
+        if (sessionData?.user) {
+          const role = sessionData.user.role || "USER";
+          const roleRoutes: Record<string, string> = {
+            ADMIN: "/admin/dashboard",
+            COACH: "/dashboard",
+            REFEREE: "/referee/dashboard",
+            USER: "/"
+          };
+          router.push(roleRoutes[role] || "/");
+          router.refresh();
+        } else {
+          setError("Невірний email або пароль");
+        }
       } else {
+        // If there's an error in res or url contains error
         setError("Невірний email або пароль");
       }
     } catch (err) {
-      setError("Помилка підключення");
+      if (err instanceof Error && err.message.includes("CredentialsSignin")) {
+        setError("Невірний email або пароль");
+      } else {
+        setError("Помилка підключення");
+      }
     } finally {
       setLoading(false);
     }
