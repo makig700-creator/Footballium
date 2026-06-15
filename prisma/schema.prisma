@@ -14,6 +14,7 @@ model Tournament {
   logo                 String?
   status               String               @default("DRAFT")
   bracketType          String
+  format               String               @default("11x11")
   maxTeams             Int
   minTeams             Int                  @default(2)
   registrationDeadline DateTime

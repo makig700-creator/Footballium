@@ -58,12 +58,16 @@ export default async function TournamentsPage() {
                 <TableCell className="font-medium text-white">{tournament.name}</TableCell>
                 <TableCell>
                   <span className="text-gray-400 text-sm">
-                    {tournament.bracketType.replace("_", " ")}
+                    {tournament.bracketType === 'ROUND_ROBIN' ? 'Круговий турнір' : 'На вибування'}
                   </span>
                 </TableCell>
                 <TableCell>
                   <Badge variant={tournament.status === "DRAFT" ? "outline" : "default"} className="bg-gray-800 text-white border-gray-700">
-                    {tournament.status}
+                    {tournament.status === 'DRAFT' ? 'Чернетка' : 
+                     tournament.status === 'REGISTRATION' ? 'Реєстрація' : 
+                     tournament.status === 'ONGOING' ? 'Триває' : 
+                     tournament.status === 'FINISHED' ? 'Завершено' : 
+                     tournament.status}
                   </Badge>
                 </TableCell>
                 <TableCell className="text-gray-400 text-sm">

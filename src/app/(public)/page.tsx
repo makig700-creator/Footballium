@@ -173,7 +173,7 @@ export default async function HomePage() {
                         <Users className="w-4 h-4 text-gray-500" /> До {tournament.maxTeams} Команд
                       </div>
                       <div className="flex items-center gap-3">
-                        <Shield className="w-4 h-4 text-gray-500" /> {tournament.bracketType.replace('_', ' ')}
+                        <Shield className="w-4 h-4 text-gray-500" /> {tournament.bracketType === 'ROUND_ROBIN' ? 'Круговий турнір' : 'На вибування'}
                       </div>
                     </div>
                     

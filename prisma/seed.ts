@@ -134,7 +134,7 @@ async function main() {
         name: "ЧЕМПІОНАТ ЖО м. ЖИТОМИР (ЕД)",
         description: "Чемпіонат Житомирської області з футзалу, сезон 2025/2026",
         status: "FINISHED",
-        bracketType: "ROUND_ROBIN",
+        bracketType: "По колу",
         maxTeams: 10,
         minTeams: 10,
         startDate: new Date("2025-10-19"),

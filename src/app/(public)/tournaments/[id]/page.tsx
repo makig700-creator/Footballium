@@ -115,7 +115,7 @@ export default async function TournamentPage({ params }: { params: Promise<{ id:
               </div>
               <div className="flex items-center gap-2 bg-[#111111] border border-gray-800 px-4 py-2 rounded-sm">
                 <Shield className="w-4 h-4 text-[#ccff00]" />
-                {tournament.bracketType.replace('_', ' ')}
+                {tournament.bracketType === 'ROUND_ROBIN' ? 'Круговий турнір' : 'На вибування'}
               </div>
               <div className="flex items-center gap-2 bg-[#111111] border border-gray-800 px-4 py-2 rounded-sm">
                 <MapPin className="w-4 h-4 text-[#ccff00]" />
@@ -267,7 +267,7 @@ export default async function TournamentPage({ params }: { params: Promise<{ id:
                 </div>
                 <div className="flex justify-between border-b border-gray-800 pb-2">
                   <span className="text-gray-500">Формат:</span>
-                  <span>11 x 11</span>
+                  <span>{tournament.format}</span>
                 </div>
                 <div className="flex justify-between border-b border-gray-800 pb-2">
                   <span className="text-gray-500">Організатор:</span>
