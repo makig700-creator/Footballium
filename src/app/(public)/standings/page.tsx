@@ -5,14 +5,28 @@ import { Trophy } from 'lucide-react'
 export const revalidate = 60
 
 export default async function StandingsPage() {
-  const standings = await prisma.standings.findMany({
-    where: { season: '2024/25', leagueId: 'premier-league' },
+  const tournamentStandings = await prisma.tournamentStanding.findMany({
+    where: { tournamentId: 'tournament-zhytomyr' },
     include: {
-      team: {
+      Team: {
         select: { id: true, name: true, shortName: true, logo: true }
       }
-    }
+    },
+    orderBy: { position: 'asc' }
   })
+
+  const standings = tournamentStandings.map(ts => ({
+    id: ts.id,
+    team: ts.Team,
+    played: ts.played,
+    won: ts.won,
+    drawn: ts.drawn,
+    lost: ts.lost,
+    gf: ts.goalsFor,
+    ga: ts.goalsAgainst,
+    points: ts.points,
+    form: '' // Form is not available in TournamentStanding
+  }))
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
@@ -21,8 +35,8 @@ export default async function StandingsPage() {
           <Trophy className="w-6 h-6 text-black" />
         </div>
         <div>
-          <h1 className="text-3xl font-black text-white tracking-tight uppercase">Турнірна таблиця Прем'єр-ліги</h1>
-          <p className="text-[#CCFF00] font-bold text-xs uppercase tracking-widest mt-1">Сезон 2024/25</p>
+          <h1 className="text-3xl font-black text-white tracking-tight uppercase">Турнірна таблиця</h1>
+          <p className="text-[#CCFF00] font-bold text-xs uppercase tracking-widest mt-1">Чемпіонат Житомирської області</p>
         </div>
       </div>
 
