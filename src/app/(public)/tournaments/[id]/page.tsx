@@ -119,7 +119,7 @@ export default async function TournamentPage({ params }: { params: Promise<{ id:
               </div>
               <div className="flex items-center gap-2 bg-[#111111] border border-gray-800 px-4 py-2 rounded-sm">
                 <MapPin className="w-4 h-4 text-[#ccff00]" />
-                Київ
+                Житомир
               </div>
             </div>
 
@@ -196,45 +196,65 @@ export default async function TournamentPage({ params }: { params: Promise<{ id:
             )}
 
             {/* Match Schedule */}
-            {(tournament.status === 'ONGOING' || tournament.status === 'FINISHED') && tournament.matches.length > 0 && (
+            {['ONGOING', 'FINISHED'].includes(tournament.status) && tournament.matches.length > 0 && (
               <section className="space-y-6">
                 <div className="flex items-center gap-4 border-b border-gray-900 pb-4">
                   <Activity className="w-6 h-6 text-[#ccff00]" />
-                  <h2 className="text-2xl font-black text-white uppercase tracking-tighter">Розклад та Результати</h2>
+                  <h2 className="text-2xl font-black text-white uppercase tracking-tighter">
+                    {tournament.status === 'FINISHED' ? 'Результати' : 'Розклад та Результати'}
+                  </h2>
                 </div>
 
-                <div className="bg-[#111111] border border-gray-800 rounded-sm divide-y divide-gray-900">
-                  {tournament.matches.map(match => (
-                    <div key={match.id} className="p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                      <div className="flex items-center gap-4 w-full sm:w-1/3">
-                        <div className="text-right w-full">
-                          <p className="font-bold text-white text-sm uppercase tracking-wider truncate">{match.homeTeam.name}</p>
-                        </div>
-                        <div className="w-8 h-8 shrink-0 bg-[#0a0a0a] rounded-sm flex items-center justify-center p-1 border border-gray-800">
-                          {match.homeTeam.logo ? <Image src={match.homeTeam.logo} alt={match.homeTeam.name} width={24} height={24} className="object-contain" /> : <Shield className="w-4 h-4 text-gray-700" />}
-                        </div>
-                      </div>
+                <div className="space-y-8">
+                  {Object.entries(
+                    tournament.matches.reduce((acc, match) => {
+                      const r = match.round || 0;
+                      if (!acc[r]) acc[r] = [];
+                      acc[r].push(match);
+                      return acc;
+                    }, {} as Record<number, typeof tournament.matches>)
+                  )
+                  .sort(([a], [b]) => Number(b) - Number(a))
+                  .map(([round, matches]) => (
+                    <div key={`round-${round}`} className="space-y-4">
+                      <h3 className="text-[#CCFF00] font-bold text-sm uppercase tracking-widest pb-2 border-b border-gray-800">
+                        {round === '0' ? 'Матчі' : `Тур ${round}`}
+                      </h3>
+                      <div className="bg-[#111111] border border-gray-800 rounded-sm divide-y divide-gray-900">
+                        {matches.map(match => (
+                          <Link href={`/matches/${match.id}`} key={match.id} className="block p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-gray-900/50 transition-colors">
+                            <div className="flex items-center gap-4 w-full sm:w-1/3">
+                              <div className="text-right w-full">
+                                <p className="font-bold text-white text-sm uppercase tracking-wider truncate">{match.homeTeam.name}</p>
+                              </div>
+                              <div className="w-8 h-8 shrink-0 bg-[#0a0a0a] rounded-sm flex items-center justify-center p-1 border border-gray-800">
+                                {match.homeTeam.logo ? <Image src={match.homeTeam.logo} alt={match.homeTeam.name} width={24} height={24} className="object-contain" /> : <Shield className="w-4 h-4 text-gray-700" />}
+                              </div>
+                            </div>
 
-                      <div className="flex flex-col items-center justify-center shrink-0 w-24">
-                        {match.status === 'FINISHED' || match.status === 'LIVE' ? (
-                          <div className="bg-[#ccff00] text-black px-4 py-1.5 rounded-sm font-black text-lg">
-                            {match.homeScore} : {match.awayScore}
-                          </div>
-                        ) : (
-                          <div className="bg-gray-800 text-gray-400 px-3 py-1.5 rounded-sm font-bold text-xs uppercase tracking-widest">
-                            {new Date(match.kickoff).toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' })}
-                          </div>
-                        )}
-                        <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-2">{new Date(match.kickoff).toLocaleDateString('uk-UA')}</span>
-                      </div>
+                            <div className="flex flex-col items-center justify-center shrink-0 w-24">
+                              {match.status === 'FINISHED' || match.status === 'LIVE' ? (
+                                <div className="bg-[#ccff00] text-black px-4 py-1.5 rounded-sm font-black text-lg">
+                                  {match.homeScore} : {match.awayScore}
+                                </div>
+                              ) : (
+                                <div className="bg-gray-800 text-gray-400 px-3 py-1.5 rounded-sm font-bold text-xs uppercase tracking-widest">
+                                  {new Date(match.kickoff).toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' })}
+                                </div>
+                              )}
+                              <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-2">{new Date(match.kickoff).toLocaleDateString('uk-UA')}</span>
+                            </div>
 
-                      <div className="flex items-center gap-4 w-full sm:w-1/3">
-                        <div className="w-8 h-8 shrink-0 bg-[#0a0a0a] rounded-sm flex items-center justify-center p-1 border border-gray-800">
-                          {match.awayTeam?.logo ? <Image src={match.awayTeam.logo} alt={match.awayTeam?.name} width={24} height={24} className="object-contain" /> : <Shield className="w-4 h-4 text-gray-700" />}
-                        </div>
-                        <div className="text-left w-full">
-                          <p className="font-bold text-white text-sm uppercase tracking-wider truncate">{match.awayTeam?.name || 'TBD'}</p>
-                        </div>
+                            <div className="flex items-center gap-4 w-full sm:w-1/3">
+                              <div className="w-8 h-8 shrink-0 bg-[#0a0a0a] rounded-sm flex items-center justify-center p-1 border border-gray-800">
+                                {match.awayTeam?.logo ? <Image src={match.awayTeam.logo} alt={match.awayTeam?.name} width={24} height={24} className="object-contain" /> : <Shield className="w-4 h-4 text-gray-700" />}
+                              </div>
+                              <div className="text-left w-full">
+                                <p className="font-bold text-white text-sm uppercase tracking-wider truncate">{match.awayTeam?.name || 'TBD'}</p>
+                              </div>
+                            </div>
+                          </Link>
+                        ))}
                       </div>
                     </div>
                   ))}

@@ -20,7 +20,7 @@ export default async function MatchesPage() {
       where: { status: 'FINISHED' },
       include: { homeTeam: true, awayTeam: true },
       orderBy: { kickoff: 'desc' },
-      take: 10,
+      take: 40,
     }),
   ])
 
@@ -52,10 +52,30 @@ export default async function MatchesPage() {
 
       {upcomingMatches.length > 0 && (
         <section>
-          <h2 className="text-xl font-black text-white uppercase tracking-widest mb-8">Заплановані матчі</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {upcomingMatches.map((match) => (
-              <FixtureCard key={match.id} match={match} />
+          <div className="flex items-center gap-3 mb-8">
+            <h2 className="text-xl font-black text-white uppercase tracking-widest">Розклад</h2>
+          </div>
+          <div className="space-y-12">
+            {Object.entries(
+              upcomingMatches.reduce((acc, match) => {
+                const r = match.round || 0;
+                if (!acc[r]) acc[r] = [];
+                acc[r].push(match);
+                return acc;
+              }, {} as Record<number, typeof upcomingMatches>)
+            )
+            .sort(([a], [b]) => Number(a) - Number(b))
+            .map(([round, matches]) => (
+              <div key={`upcoming-${round}`}>
+                <h3 className="text-[#CCFF00] font-bold text-sm uppercase tracking-widest mb-4 pb-2 border-b border-white/10">
+                  {round === '0' ? 'Матчі' : `Тур ${round}`}
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {matches.map((match) => (
+                    <FixtureCard key={match.id} match={match} />
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         </section>
@@ -63,10 +83,30 @@ export default async function MatchesPage() {
 
       {pastMatches.length > 0 && (
         <section>
-          <h2 className="text-xl font-black text-gray-500 uppercase tracking-widest mb-8">Останні результати</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 opacity-80 hover:opacity-100 transition-opacity">
-            {pastMatches.map((match) => (
-              <FixtureCard key={match.id} match={match} />
+          <div className="flex items-center gap-3 mb-8">
+            <h2 className="text-xl font-black text-gray-400 uppercase tracking-widest">Результати</h2>
+          </div>
+          <div className="space-y-12 opacity-90">
+            {Object.entries(
+              pastMatches.reduce((acc, match) => {
+                const r = match.round || 0;
+                if (!acc[r]) acc[r] = [];
+                acc[r].push(match);
+                return acc;
+              }, {} as Record<number, typeof pastMatches>)
+            )
+            .sort(([a], [b]) => Number(b) - Number(a)) // Descending for past
+            .map(([round, matches]) => (
+              <div key={`past-${round}`}>
+                <h3 className="text-zinc-500 font-bold text-sm uppercase tracking-widest mb-4 pb-2 border-b border-white/5">
+                  {round === '0' ? 'Матчі' : `Тур ${round}`}
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 hover:opacity-100 transition-opacity">
+                  {matches.map((match) => (
+                    <FixtureCard key={match.id} match={match} />
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         </section>
