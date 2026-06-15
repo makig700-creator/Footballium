@@ -139,7 +139,7 @@ export default async function MatchDetailsPage({ params }: Props) {
                   {format(new Date(match.scheduledAt || match.kickoff), "HH:mm", { locale: uk })}
                 </div>
               )}
-              
+
               <div className="flex items-center gap-4 sm:gap-6 text-5xl sm:text-7xl font-mono font-black text-white tracking-tighter">
                 <span>{match.homeScore ?? '-'}</span>
                 <span className="text-zinc-600 text-3xl sm:text-5xl pb-2">:</span>
@@ -179,7 +179,7 @@ export default async function MatchDetailsPage({ params }: Props) {
               <Clock className="w-5 h-5 text-[#CCFF00]" />
               Хід матчу
             </h3>
-            
+
             {match.events.length === 0 ? (
               <div className="text-center py-12 text-zinc-500 font-medium">
                 Немає подій для відображення
@@ -196,14 +196,14 @@ export default async function MatchDetailsPage({ params }: Props) {
                       <div className="w-[40px] sm:w-[50px] flex-shrink-0 text-right">
                         <span className="text-white font-mono font-bold text-lg group-hover:text-[#CCFF00] transition-colors">{event.minute}"</span>
                       </div>
-                      
+
                       <div className="w-4 h-4 rounded-full bg-zinc-900 border-2 border-zinc-700 flex items-center justify-center z-10 shadow-sm" />
-                      
+
                       <div className="flex-1 bg-white/5 backdrop-blur-sm border border-white/5 rounded-xl p-4 flex items-center gap-4 hover:bg-white/10 transition-colors">
                         <div className="flex-shrink-0 flex items-center justify-center w-8 h-8 bg-zinc-900/80 rounded-lg">
                           {getEventIcon(event.type)}
                         </div>
-                        
+
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
                             {player && (
@@ -217,7 +217,7 @@ export default async function MatchDetailsPage({ params }: Props) {
                             <p className="text-zinc-400 text-xs sm:text-sm mt-1">{event.comment}</p>
                           )}
                         </div>
-                        
+
                         <div className="flex-shrink-0 hidden sm:block">
                           <Image
                             src={(isHome ? match.homeTeam.logo : match.awayTeam?.logo) || `https://ui-avatars.com/api/?name=${isHome ? match.homeTeam.shortName : match.awayTeam?.shortName}&background=random`}
@@ -240,7 +240,7 @@ export default async function MatchDetailsPage({ params }: Props) {
         <div className="space-y-8">
           <section className="bg-zinc-900/50 backdrop-blur-md border border-white/10 rounded-2xl p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]">
             <h3 className="text-xl font-black text-white uppercase tracking-widest mb-6">Склади команд</h3>
-            
+
             {!match.lineup ? (
               <div className="text-center py-8 text-zinc-500 font-medium text-sm border border-dashed border-zinc-700/50 rounded-xl">
                 Склади ще не оголошені
@@ -252,7 +252,7 @@ export default async function MatchDetailsPage({ params }: Props) {
                     {match.lineup.formation}
                   </span>
                 </div>
-                
+
                 <div className="space-y-8">
                   {/* HOME TEAM LINEUP */}
                   <div>
@@ -260,11 +260,13 @@ export default async function MatchDetailsPage({ params }: Props) {
                       <Image src={match.homeTeam.logo || `https://ui-avatars.com/api/?name=${match.homeTeam.shortName}&background=random`} width={20} height={20} alt="" className="rounded-full" />
                       {match.homeTeam.shortName}
                     </h4>
-                    
+
                     <div className="space-y-1">
                       {match.lineup.slots.filter(s => s.player.teamId === match.homeTeamId && s.isStarter).map((slot) => (
                         <div key={slot.id} className="flex items-center gap-3 px-2 py-1.5 rounded-md bg-white/5 hover:bg-white/10 transition-colors">
-                          <span className="w-5 text-zinc-500 font-mono text-xs text-right">{slot.player.number}</span>
+                          <span className="w-5 text-zinc-500 font-mono text-xs text-right">
+                            {match.lineup!.formation === '5x5' ? (slot.slotLabel || slot.player.number) : slot.player.number}
+                          </span>
                           <span className="text-white font-medium text-sm">{slot.player.firstName} {slot.player.lastName}</span>
                         </div>
                       ))}
@@ -272,46 +274,48 @@ export default async function MatchDetailsPage({ params }: Props) {
                     {/* Home Subs */}
                     {match.lineup.slots.some(s => s.player.teamId === match.homeTeamId && !s.isStarter) && (
                       <div className="space-y-1 mt-3">
-                         <h5 className="text-zinc-500 text-[10px] uppercase tracking-widest pl-2 mb-2">Запасні</h5>
-                         {match.lineup.slots.filter(s => s.player.teamId === match.homeTeamId && !s.isStarter).map((slot) => (
-                           <div key={slot.id} className="flex items-center gap-3 px-2 py-1 rounded-md hover:bg-white/5 transition-colors opacity-70">
-                             <span className="w-5 text-zinc-600 font-mono text-xs text-right">{slot.player.number}</span>
-                             <span className="text-zinc-300 font-medium text-sm">{slot.player.firstName} {slot.player.lastName}</span>
-                           </div>
-                         ))}
+                        <h5 className="text-zinc-500 text-[10px] uppercase tracking-widest pl-2 mb-2">Запасні</h5>
+                        {match.lineup.slots.filter(s => s.player.teamId === match.homeTeamId && !s.isStarter).map((slot) => (
+                          <div key={slot.id} className="flex items-center gap-3 px-2 py-1 rounded-md hover:bg-white/5 transition-colors opacity-70">
+                            <span className="w-5 text-zinc-600 font-mono text-xs text-right">{slot.player.number}</span>
+                            <span className="text-zinc-300 font-medium text-sm">{slot.player.firstName} {slot.player.lastName}</span>
+                          </div>
+                        ))}
                       </div>
                     )}
                   </div>
 
                   {/* AWAY TEAM LINEUP */}
                   {match.awayTeam && (
-                  <div>
-                    <h4 className="flex items-center gap-2 text-white font-bold text-sm uppercase tracking-widest mb-4 border-b border-white/10 pb-2">
-                      <Image src={match.awayTeam.logo || `https://ui-avatars.com/api/?name=${match.awayTeam.shortName}&background=random`} width={20} height={20} alt="" className="rounded-full" />
-                      {match.awayTeam.shortName}
-                    </h4>
-                    
-                    <div className="space-y-1">
-                      {match.lineup.slots.filter(s => s.player.teamId === match.awayTeamId && s.isStarter).map((slot) => (
-                        <div key={slot.id} className="flex items-center gap-3 px-2 py-1.5 rounded-md bg-white/5 hover:bg-white/10 transition-colors">
-                          <span className="w-5 text-zinc-500 font-mono text-xs text-right">{slot.player.number}</span>
-                          <span className="text-white font-medium text-sm">{slot.player.firstName} {slot.player.lastName}</span>
-                        </div>
-                      ))}
-                    </div>
-                    {/* Away Subs */}
-                    {match.lineup.slots.some(s => s.player.teamId === match.awayTeamId && !s.isStarter) && (
-                      <div className="space-y-1 mt-3">
-                         <h5 className="text-zinc-500 text-[10px] uppercase tracking-widest pl-2 mb-2">Запасні</h5>
-                         {match.lineup.slots.filter(s => s.player.teamId === match.awayTeamId && !s.isStarter).map((slot) => (
-                           <div key={slot.id} className="flex items-center gap-3 px-2 py-1 rounded-md hover:bg-white/5 transition-colors opacity-70">
-                             <span className="w-5 text-zinc-600 font-mono text-xs text-right">{slot.player.number}</span>
-                             <span className="text-zinc-300 font-medium text-sm">{slot.player.firstName} {slot.player.lastName}</span>
-                           </div>
-                         ))}
+                    <div>
+                      <h4 className="flex items-center gap-2 text-white font-bold text-sm uppercase tracking-widest mb-4 border-b border-white/10 pb-2">
+                        <Image src={match.awayTeam.logo || `https://ui-avatars.com/api/?name=${match.awayTeam.shortName}&background=random`} width={20} height={20} alt="" className="rounded-full" />
+                        {match.awayTeam.shortName}
+                      </h4>
+
+                      <div className="space-y-1">
+                        {match.lineup.slots.filter(s => s.player.teamId === match.awayTeamId && s.isStarter).map((slot) => (
+                          <div key={slot.id} className="flex items-center gap-3 px-2 py-1.5 rounded-md bg-white/5 hover:bg-white/10 transition-colors">
+                            <span className="w-5 text-zinc-500 font-mono text-xs text-right">
+                              {match.lineup!.formation === '5x5' ? (slot.slotLabel || slot.player.number) : slot.player.number}
+                            </span>
+                            <span className="text-white font-medium text-sm">{slot.player.firstName} {slot.player.lastName}</span>
+                          </div>
+                        ))}
                       </div>
-                    )}
-                  </div>
+                      {/* Away Subs */}
+                      {match.lineup.slots.some(s => s.player.teamId === match.awayTeamId && !s.isStarter) && (
+                        <div className="space-y-1 mt-3">
+                          <h5 className="text-zinc-500 text-[10px] uppercase tracking-widest pl-2 mb-2">Запасні</h5>
+                          {match.lineup.slots.filter(s => s.player.teamId === match.awayTeamId && !s.isStarter).map((slot) => (
+                            <div key={slot.id} className="flex items-center gap-3 px-2 py-1 rounded-md hover:bg-white/5 transition-colors opacity-70">
+                              <span className="w-5 text-zinc-600 font-mono text-xs text-right">{slot.player.number}</span>
+                              <span className="text-zinc-300 font-medium text-sm">{slot.player.firstName} {slot.player.lastName}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   )}
                 </div>
               </div>
