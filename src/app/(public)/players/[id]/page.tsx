@@ -13,7 +13,7 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
     where: { id: resolvedParams.id },
     include: {
       team: true,
-      stats: { include: { tournament: true } },
+      stats: { include: { Tournament: true } },
     }
   })
 
@@ -157,7 +157,7 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
                     <tr key={stat.id} className="hover:bg-[#1a1a1a] transition-colors">
                       <td className="px-6 py-4 font-bold text-white uppercase tracking-wider">
                         <Link href={`/tournaments/${stat.tournamentId}`} className="hover:text-[#CCFF00] transition-colors">
-                          {stat.tournament.name}
+                          {stat.Tournament.name}
                         </Link>
                       </td>
                       <td className="px-6 py-4 text-center text-gray-400 font-bold">{stat.matchesPlayed}</td>
