@@ -13,19 +13,33 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
     where: { id: resolvedParams.id },
     include: {
       team: true,
-      stats: true,
+      stats: { include: { tournament: true } },
     }
   })
 
   if (!player) notFound()
 
+  // Calculate global stats
+  const globalStats = player.stats.reduce((acc, stat) => {
+    acc.appearances += stat.matchesPlayed;
+    acc.goals += stat.goals;
+    acc.assists += 0; // if we add assists later
+    acc.minutesPlayed += stat.minutesPlayed;
+    acc.cleanSheets += 0;
+    acc.yellowCards += stat.yellowCards;
+    acc.redCards += stat.redCards;
+    return acc;
+  }, {
+    appearances: 0, goals: 0, assists: 0, minutesPlayed: 0, cleanSheets: 0, yellowCards: 0, redCards: 0
+  });
+
   const stats = [
-    { label: 'Матчі', value: player.stats?.appearances || 0 },
-    { label: 'Голи', value: player.stats?.goals || 0 },
-    { label: 'Асисти', value: player.stats?.assists || 0 },
-    { label: 'Хвилини', value: player.stats?.minutesPlayed || 0 },
-    { label: 'Сухі матчі', value: player.stats?.cleanSheets || 0 },
-    { label: 'Рейтинг', value: player.stats?.rating?.toFixed(1) || 'N/A' },
+    { label: 'Матчі', value: globalStats.appearances },
+    { label: 'Голи', value: globalStats.goals },
+    { label: 'Асисти', value: globalStats.assists },
+    { label: 'Хвилини', value: globalStats.minutesPlayed },
+    { label: 'Сухі матчі', value: globalStats.cleanSheets },
+    { label: 'Рейтинг', value: 'N/A' },
   ]
 
   return (
@@ -116,13 +130,46 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
         <div className="grid grid-cols-2 gap-6 mt-6">
            <div className="bg-[#1c1a1a] border border-gray-800 p-6 flex items-center justify-between border-l-4 border-l-yellow-400 rounded-sm">
              <span className="font-black text-gray-400 uppercase tracking-widest text-[10px]">Жовті картки</span>
-             <span className="text-2xl font-black text-white">{player.stats?.yellowCards || 0}</span>
+             <span className="text-2xl font-black text-white">{globalStats.yellowCards}</span>
            </div>
            <div className="bg-[#1c1a1a] border border-gray-800 p-6 flex items-center justify-between border-l-4 border-l-red-500 rounded-sm">
              <span className="font-black text-gray-400 uppercase tracking-widest text-[10px]">Червоні картки</span>
-             <span className="text-2xl font-black text-white">{player.stats?.redCards || 0}</span>
+             <span className="text-2xl font-black text-white">{globalStats.redCards}</span>
            </div>
         </div>
+
+        {/* Tournament Breakdown */}
+        {player.stats.length > 0 && (
+          <div className="mt-12">
+            <h3 className="text-xl font-black text-white uppercase tracking-widest mb-6">Статистика по турнірах</h3>
+            <div className="bg-[#1c1a1a] border border-gray-800 rounded-sm overflow-hidden">
+              <table className="w-full text-sm text-left">
+                <thead className="text-[10px] uppercase bg-[#0a0a0a] text-gray-400 font-black tracking-wider">
+                  <tr>
+                    <th className="px-6 py-4">Турнір</th>
+                    <th className="px-6 py-4 text-center">Матчі</th>
+                    <th className="px-6 py-4 text-center">Голи</th>
+                    <th className="px-6 py-4 text-center">Хвилини</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-800">
+                  {player.stats.map(stat => (
+                    <tr key={stat.id} className="hover:bg-[#1a1a1a] transition-colors">
+                      <td className="px-6 py-4 font-bold text-white uppercase tracking-wider">
+                        <Link href={`/tournaments/${stat.tournamentId}`} className="hover:text-[#CCFF00] transition-colors">
+                          {stat.tournament.name}
+                        </Link>
+                      </td>
+                      <td className="px-6 py-4 text-center text-gray-400 font-bold">{stat.matchesPlayed}</td>
+                      <td className="px-6 py-4 text-center text-[#CCFF00] font-black text-lg">{stat.goals}</td>
+                      <td className="px-6 py-4 text-center text-gray-400">{stat.minutesPlayed}&apos;</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

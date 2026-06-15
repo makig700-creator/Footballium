@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { pusherServer } from "@/lib/pusher";
 import { EventType } from "@prisma/client";
+import { recalculateMatchStats, recalculateStandings, recalculatePlayerStats } from "@/lib/stats-calculator";
 
 export async function GET(
   request: Request,
@@ -62,34 +63,30 @@ export async function POST(
       },
     });
 
-    // Update match score if necessary
-    let homeScore = match.homeScore || 0;
-    let awayScore = match.awayScore || 0;
-    let scoreChanged = false;
+    // Update match score using stats calculator
+    await recalculateMatchStats(matchId);
+    
+    const updatedMatch = await prisma.match.findUnique({
+      where: { id: matchId },
+    }) || match;
 
-    if (type === EventType.GOAL || type === EventType.PENALTY_GOAL) {
-      if (teamId === match.homeTeamId) {
-        homeScore += 1;
-        scoreChanged = true;
-      } else if (teamId === match.awayTeamId) {
-        awayScore += 1;
-        scoreChanged = true;
+    if (updatedMatch.tournamentId) {
+      await recalculateStandings(updatedMatch.tournamentId);
+      if (playerId) {
+        await recalculatePlayerStats(playerId, updatedMatch.tournamentId);
       }
-    } else if (type === EventType.OWN_GOAL) {
-      if (teamId === match.homeTeamId) {
-        awayScore += 1; // Own goal by home team gives point to away
-        scoreChanged = true;
-      } else if (teamId === match.awayTeamId) {
-        homeScore += 1; // Own goal by away team gives point to home
-        scoreChanged = true;
-      }
-    }
-
-    let updatedMatch = match;
-    if (scoreChanged) {
-      updatedMatch = await prisma.match.update({
-        where: { id: matchId },
-        data: { homeScore, awayScore },
+      
+      const updatedStandings = await prisma.tournamentStanding.findMany({
+        where: { tournamentId: updatedMatch.tournamentId },
+        orderBy: [
+          { points: 'desc' },
+          { goalDiff: 'desc' },
+          { goalsFor: 'desc' }
+        ],
+        include: { team: true }
+      });
+      await pusherServer.trigger(`tournament-${updatedMatch.tournamentId}`, 'standings-updated', {
+        standings: updatedStandings
       });
     }
 
