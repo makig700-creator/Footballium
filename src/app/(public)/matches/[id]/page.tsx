@@ -53,7 +53,6 @@ export default async function MatchDetailsPage({ params }: Props) {
           }
         }
       }
-      }
     }
   })
 
