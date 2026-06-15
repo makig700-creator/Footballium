@@ -3,7 +3,6 @@ import bcrypt from 'bcryptjs'
 
 const Position = { GK: 'GK', DEF: 'DEF', MID: 'MID', FWD: 'FWD' }
 const Role = { ADMIN: 'ADMIN', COACH: 'COACH', VIEWER: 'VIEWER', REFEREE: 'REFEREE' }
-
 const prisma = new PrismaClient()
 
 async function main() {
@@ -333,27 +332,25 @@ async function main() {
   }
 
   console.log('✅ News articles created')
-
   // ── Coach User ────────────────────────────────────────────────────────────
   const hashedPassword = await bcrypt.hash('Coach123!', 12)
   await prisma.user.upsert({
-    where: { email: 'coach@functional.app' },
+    where: { email: 'coach@gmail.com' },
     update: {},
     create: {
-      email: 'coach@functional.app',
+      email: 'coach@gmail.com',
       password: hashedPassword,
-      name: 'Mikel Arteta',
+      name: 'General Coach',
       role: Role.COACH,
-      teamId: arsenal.id,
     },
   })
 
   const adminPassword = await bcrypt.hash('Admin123!', 12)
   await prisma.user.upsert({
-    where: { email: 'admin@functional.app' },
+    where: { email: 'admin@gmail.com' },
     update: {},
     create: {
-      email: 'admin@functional.app',
+      email: 'admin@gmail.com',
       password: adminPassword,
       name: 'Admin User',
       role: Role.ADMIN,
@@ -378,7 +375,7 @@ async function main() {
 
   const createdZhytomyrTeams: Record<string, any> = {};
   for (const t of zhytomyrTeamsData) {
-    createdZhytomyrTeams[t.name] = await prisma.team.upsert({
+    const team = await prisma.team.upsert({
       where: { id: t.slug },
       update: {},
       create: {
@@ -389,6 +386,25 @@ async function main() {
         stadium: "ФОК",
         founded: 2020,
       }
+    });
+    createdZhytomyrTeams[t.name] = team;
+
+    const coachEmail = `coach_${t.slug}@gmail.com`;
+    const coach = await prisma.user.upsert({
+      where: { email: coachEmail },
+      update: {},
+      create: {
+        email: coachEmail,
+        password: hashedPassword,
+        name: `Тренер ${t.name}`,
+        role: Role.COACH,
+        teamId: team.id,
+      }
+    });
+
+    await prisma.team.update({
+      where: { id: team.id },
+      data: { coachId: coach.id }
     });
   }
 
@@ -431,7 +447,7 @@ async function main() {
   console.log('✅ Zhytomyr Teams & Players created')
 
   // ── Zhytomyr Tournament ───────────────────────────────────────────────────
-  const adminUser = await prisma.user.findUnique({ where: { email: 'admin@functional.app' } });
+  const adminUser = await prisma.user.findUnique({ where: { email: 'admin@gmail.com' } });
   if (adminUser) {
     const ztTournament = await prisma.tournament.upsert({
       where: { id: 'tournament-zhytomyr' },
@@ -441,7 +457,7 @@ async function main() {
         name: "ЧЕМПІОНАТ ЖО м. ЖИТОМИР (ЕД)",
         description: "Чемпіонат Житомирської області з футзалу, сезон 2025/2026",
         status: "FINISHED",
-        bracketType: "ROUND_ROBIN",
+        bracketType: "По колу",
         maxTeams: 10,
         minTeams: 10,
         startDate: new Date("2025-10-19"),
@@ -479,23 +495,27 @@ async function main() {
       { team: "ЖВІ ім. Корольова", played: 18, won: 3, drawn: 1, lost: 14, goalsFor: 27, goalsAgainst: 60, points: 10 },
     ];
 
+    let position = 1;
     for (const s of standingsRaw) {
       const team = createdZhytomyrTeams[s.team];
       if (team) {
-        await prisma.standings.upsert({
-          where: { teamId_season_leagueId: { teamId: team.id, season: '2025/26', leagueId: ztTournament.id } },
+        await prisma.tournamentStanding.upsert({
+          where: { tournamentId_teamId: { tournamentId: ztTournament.id, teamId: team.id } },
           update: {},
           create: {
+            id: `ts-${ztTournament.id}-${team.id}`,
+            tournamentId: ztTournament.id,
             teamId: team.id,
-            season: '2025/26',
-            leagueId: ztTournament.id,
+            position: position++,
             played: s.played,
             won: s.won,
             drawn: s.drawn,
             lost: s.lost,
-            gf: s.goalsFor,
-            ga: s.goalsAgainst,
+            goalsFor: s.goalsFor,
+            goalsAgainst: s.goalsAgainst,
+            goalDiff: s.goalsFor - s.goalsAgainst,
             points: s.points,
+            updatedAt: new Date(),
           }
         });
       }
@@ -506,8 +526,12 @@ async function main() {
   console.log('🎉 Database seeded successfully!')
   console.log('')
   console.log('Login credentials:')
-  console.log('  Coach: coach@functional.app / Coach123!')
-  console.log('  Admin: admin@functional.app / Admin123!')
+  console.log('  Coach: coach@gmail.com / Coach123!')
+  console.log('  Admin: admin@gmail.com / Admin123!')
+  console.log('  Zhytomyr Coaches (Password: Coach123!):')
+  for (const t of zhytomyrTeamsData) {
+    console.log(`    ${t.name}: coach_${t.slug}@gmail.com`);
+  }
 }
 
 main()

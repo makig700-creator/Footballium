@@ -28,6 +28,11 @@ export default function LoginPage() {
         redirect: false,
       });
 
+      if (res?.error) {
+        setError("Невірний email або пароль");
+        return;
+      }
+
       if (res?.ok) {
         // Fetch session to get the role
         const sessionRes = await fetch("/api/auth/session");
@@ -46,7 +51,7 @@ export default function LoginPage() {
         setError("Невірний email або пароль");
       }
     } catch (err) {
-      setError("Помилка підключення");
+      setError("Невірний email або пароль");
     } finally {
       setLoading(false);
     }

@@ -31,7 +31,7 @@ export function FixtureCard({ match }: { match: FixtureData }) {
         <div className="bg-[#0a0a0a] px-4 py-3 flex items-center justify-between border-b border-gray-800 text-[10px] font-bold uppercase tracking-widest">
           <div className="flex items-center gap-3">
             <span className="text-gray-500">
-              {match.leagueId === 'premier-league' ? 'Premier League' : match.leagueId}
+              {match.leagueId}
             </span>
             {isLive ? (
               <span className="flex items-center gap-1.5 text-black bg-[#CCFF00] px-2 py-0.5 rounded-sm">

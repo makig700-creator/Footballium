@@ -47,8 +47,7 @@ export function LeagueTable({ standings }: { standings: StandingsRow[] }) {
             <TableHead className="text-center w-12 hidden sm:table-cell text-[10px] font-bold uppercase tracking-widest text-gray-400" title="Забиті голи">ЗГ</TableHead>
             <TableHead className="text-center w-12 hidden sm:table-cell text-[10px] font-bold uppercase tracking-widest text-gray-400" title="Пропущені голи">ПГ</TableHead>
             <TableHead className="text-center w-12 text-[10px] font-bold uppercase tracking-widest text-gray-400" title="Різниця голів">РГ</TableHead>
-            <TableHead className="text-center w-16 text-[10px] font-black uppercase tracking-widest text-[#CCFF00]" title="Очки">О</TableHead>
-            <TableHead className="hidden md:table-cell text-center text-[10px] font-bold uppercase tracking-widest text-gray-400" title="Форма (останні 5 матчів)">Форма</TableHead>
+            <TableHead className="text-center w-16 text-[10px] font-bold uppercase tracking-widest text-white" title="Очки">О</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody className="divide-y divide-gray-800/40">
@@ -77,25 +76,7 @@ export function LeagueTable({ standings }: { standings: StandingsRow[] }) {
                 <TableCell className="text-center text-gray-500 hidden sm:table-cell">{row.gf}</TableCell>
                 <TableCell className="text-center text-gray-500 hidden sm:table-cell">{row.ga}</TableCell>
                 <TableCell className="text-center text-gray-400">{row.gf - row.ga}</TableCell>
-                <TableCell className="text-center font-black text-[#CCFF00] text-base">{row.points}</TableCell>
-                <TableCell className="hidden md:table-cell">
-                  <div className="flex items-center justify-center gap-1.5">
-                    {row.form.split(',').slice(0, 5).map((result, i) => {
-                      const formMap: Record<string, string> = { W: 'В', D: 'Н', L: 'П' };
-                      return (
-                        <span
-                          key={i}
-                          className={cn(
-                            "flex items-center justify-center w-5 h-5 rounded-sm text-[10px] font-bold text-white shadow-sm border border-gray-800",
-                            getFormBadgeColor(result)
-                          )}
-                        >
-                          {formMap[result] || result}
-                        </span>
-                      )
-                    })}
-                  </div>
-                </TableCell>
+                <TableCell className="text-center font-bold text-white text-base">{row.points}</TableCell>
               </TableRow>
             )
           })}
