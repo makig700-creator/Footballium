@@ -18,19 +18,19 @@ export default async function EditTournamentPage(props: { params: Promise<{ id: 
   if (!tournament) return notFound()
 
   return (
-    <div className="space-y-6 max-w-2xl">
-      <div className="flex items-center gap-4 text-gray-400 text-sm">
-        <Link href={`/admin/tournaments/${tournament.id}`} className="hover:text-white flex items-center gap-1">
+    <div className="space-y-8 max-w-3xl mx-auto">
+      <div className="flex items-center gap-4 text-zinc-400 text-sm">
+        <Link href={`/admin/tournaments/${tournament.id}`} className="hover:text-white flex items-center gap-2 transition-colors duration-200">
           <ArrowLeft className="w-4 h-4" /> Назад до турніру
         </Link>
       </div>
 
-      <div>
-        <h1 className="text-3xl font-black text-white uppercase tracking-wider">Редагувати турнір</h1>
-        <p className="text-gray-400 mt-1">{tournament.name}</p>
-      </div>
-
-      <div className="bg-[#0a0a0a] border border-gray-900 rounded-lg p-6">
+      <div className="bg-[#0a0a0a] border border-gray-900 rounded-2xl p-8">
+        <div className="mb-8 border-b border-gray-900 pb-6">
+          <h1 className="text-3xl font-black text-white uppercase tracking-tight">Редагувати турнір</h1>
+          <p className="text-zinc-500 mt-2 font-mono text-sm">{tournament.name}</p>
+        </div>
+        
         <EditTournamentForm tournament={tournament} />
       </div>
     </div>

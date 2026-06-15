@@ -5,6 +5,15 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Calendar, Users, Settings, Play, ArrowLeft } from "lucide-react"
+import { format } from "date-fns"
+import { uk } from "date-fns/locale"
+
+const statusMap: Record<string, string> = {
+  DRAFT: "Чорнетка",
+  REGISTRATION: "Реєстрація",
+  ONGOING: "В процесі",
+  FINISHED: "Завершено",
+}
 
 export default async function TournamentDetailsPage(props: { params: Promise<{ id: string }> }) {
   const session = await auth()
@@ -36,7 +45,7 @@ export default async function TournamentDetailsPage(props: { params: Promise<{ i
           <div className="flex items-center gap-3">
             <h1 className="text-3xl font-black text-white uppercase tracking-wider">{tournament.name}</h1>
             <Badge variant="outline" className="bg-gray-800 text-white border-gray-700">
-              {tournament.status}
+              {statusMap[tournament.status] || tournament.status}
             </Badge>
           </div>
           {tournament.description && (
@@ -81,15 +90,15 @@ export default async function TournamentDetailsPage(props: { params: Promise<{ i
           <div className="space-y-3 text-sm">
             <div className="flex justify-between border-b border-gray-800 pb-2">
               <span className="text-gray-500">Кінець реєстрації:</span>
-              <span className="text-white font-medium">{tournament.registrationDeadline.toLocaleDateString()}</span>
+              <span className="text-white font-medium">{format(tournament.registrationDeadline, "PPP", { locale: uk })}</span>
             </div>
             <div className="flex justify-between border-b border-gray-800 pb-2">
               <span className="text-gray-500">Початок:</span>
-              <span className="text-white font-medium">{tournament.startDate.toLocaleDateString()}</span>
+              <span className="text-white font-medium">{format(tournament.startDate, "PPP", { locale: uk })}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-500">Завершення:</span>
-              <span className="text-white font-medium">{tournament.endDate.toLocaleDateString()}</span>
+              <span className="text-white font-medium">{format(tournament.endDate, "PPP", { locale: uk })}</span>
             </div>
           </div>
         </div>

@@ -16,7 +16,7 @@ export default async function LineupPage({ params }: { params: Promise<{ id: str
   const [match, players, existingLineup] = await Promise.all([
     prisma.match.findUnique({
       where: { id: matchId },
-      include: { homeTeam: true, awayTeam: true }
+      include: { homeTeam: true, awayTeam: true, tournament: true }
     }),
     prisma.player.findMany({
       where: { teamId },
@@ -29,6 +29,8 @@ export default async function LineupPage({ params }: { params: Promise<{ id: str
   ])
 
   if (!match) notFound()
+
+  const format = (match.tournament as any)?.format || '11x11'
 
   // Prepare initial data if lineup exists
   let initialLineup = undefined
@@ -68,7 +70,7 @@ export default async function LineupPage({ params }: { params: Promise<{ id: str
         <p className="text-[#CCFF00] font-bold text-xs uppercase tracking-widest mt-2">проти {opponent?.name || 'TBD'} • {match.venue}</p>
       </div>
 
-      <LineupBuilder matchId={matchId} players={playersWithNames as any} initialLineup={initialLineup} />
+      <LineupBuilder matchId={matchId} players={playersWithNames as any} initialLineup={initialLineup} format={format} />
     </div>
   )
 }
