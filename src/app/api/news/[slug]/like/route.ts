@@ -28,7 +28,7 @@ export async function GET(
         where: {
           newsId_userId: {
             newsId: news.id,
-            userId: session.user.id,
+            userId: session?.user?.id as string,
           },
         },
       });
@@ -73,7 +73,7 @@ export async function POST(
       where: {
         newsId_userId: {
           newsId: news.id,
-          userId: session.user.id,
+          userId: session?.user?.id as string,
         },
       },
     });
@@ -89,7 +89,7 @@ export async function POST(
       await prisma.newsLike.create({
         data: {
           newsId: news.id,
-          userId: session.user.id,
+          userId: session?.user?.id as string,
         },
       });
       return NextResponse.json({ action: "liked" }, { status: 201 });

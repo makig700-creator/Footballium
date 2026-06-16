@@ -32,10 +32,11 @@ export function ProfileForm() {
       name: "",
       phone: "",
       refereeCategory: "",
+      photo: "",
     }
   });
 
-  const photo = watch("photo") as string | undefined;
+  const photo = watch("photo");
 
   useEffect(() => {
     fetch("/api/settings/profile")
@@ -44,7 +45,7 @@ export function ProfileForm() {
         setData(d);
         setValue("name", d.name || "");
         setValue("phone", d.phone || "");
-        setValue("photo" as any, d.photo);
+        setValue("photo", d.photo || "");
         if (d.role === "REFEREE") {
           setValue("refereeCategory", d.refereeCategory || "");
         }
@@ -72,7 +73,7 @@ export function ProfileForm() {
       });
       const data = await res.json();
       if (data.url) {
-        setValue("photo" as any, data.url);
+        setValue("photo", data.url);
         toast.success("Фото завантажено");
       }
     } catch {
@@ -203,7 +204,7 @@ export function ProfileForm() {
               <Label>Категорія судді</Label>
               <Select
                 value={watch("refereeCategory")}
-                onValueChange={(val) => setValue("refereeCategory", val)}
+                onValueChange={(val) => setValue("refereeCategory", val || "")}
               >
                 <SelectTrigger className="bg-zinc-900 border-white/10 text-white focus:ring-[#CCFF00]">
                   <SelectValue placeholder="Оберіть категорію" />

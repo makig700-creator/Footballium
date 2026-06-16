@@ -120,6 +120,7 @@ export async function recalculateStandings(tournamentId: string) {
     ...sortedTeams.map((team, index) => 
       prisma.tournamentStanding.create({
         data: {
+          id: crypto.randomUUID(),
           tournamentId,
           teamId: team.teamId,
           position: index + 1,
@@ -130,7 +131,8 @@ export async function recalculateStandings(tournamentId: string) {
           goalsFor: team.goalsFor,
           goalsAgainst: team.goalsAgainst,
           goalDiff: team.goalDiff,
-          points: team.points
+          points: team.points,
+          updatedAt: new Date()
         }
       })
     )
@@ -183,10 +185,10 @@ export async function recalculatePlayerStats(playerId: string, tournamentId: str
       }
     },
     update: {
-      goals, ownGoals, yellowCards, redCards, matchesPlayed, minutesPlayed
+      goals, ownGoals, yellowCards, redCards, matchesPlayed, minutesPlayed, updatedAt: new Date()
     },
     create: {
-      playerId, tournamentId, goals, ownGoals, yellowCards, redCards, matchesPlayed, minutesPlayed
+      playerId, tournamentId, goals, ownGoals, yellowCards, redCards, matchesPlayed, minutesPlayed, updatedAt: new Date()
     }
   });
 }

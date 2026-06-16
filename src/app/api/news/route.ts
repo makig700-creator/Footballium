@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
 
     if (!result.success) {
       return NextResponse.json(
-        { error: "Invalid data", details: result.error.errors },
+        { error: "Invalid data", details: result.error.issues },
         { status: 400 }
       );
     }
@@ -78,13 +78,13 @@ export async function POST(request: NextRequest) {
         excerpt: result.data.excerpt,
         content: result.data.content,
         coverImage: result.data.coverImage,
-        authorId: session.user.id,
+        authorId: session?.user?.id as string,
         status: "DRAFT",
       },
     });
 
     await logActivity({
-      userId: session.user.id,
+      userId: session?.user?.id as string,
       action: "CREATE_NEWS",
       entity: "News",
       entityId: news.id,

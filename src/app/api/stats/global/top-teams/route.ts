@@ -4,14 +4,14 @@ import { prisma } from "@/lib/prisma";
 export async function GET() {
   try {
     const standings = await prisma.tournamentStanding.findMany({
-      include: { team: true }
+      include: { Team: true }
     });
 
     const teamMap = new Map<string, any>();
     for (const st of standings) {
       if (!teamMap.has(st.teamId)) {
         teamMap.set(st.teamId, {
-          team: st.team,
+          team: st.Team,
           played: 0,
           won: 0,
           points: 0

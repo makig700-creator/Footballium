@@ -24,7 +24,7 @@ export default async function GlobalStatsPage({
   // Top Scorers
   const stats = await prisma.playerStats.findMany({
     where: { goals: { gt: 0 }, ...statsWhere },
-    include: { player: { include: { team: true } }, tournament: true }
+    include: { player: { include: { team: true } }, Tournament: true }
   });
 
   const playerMap = new Map<string, any>();
@@ -48,14 +48,14 @@ export default async function GlobalStatsPage({
   // Top Teams
   const standings = await prisma.tournamentStanding.findMany({
     where: standingsWhere,
-    include: { team: true }
+    include: { Team: true }
   });
 
   const teamMap = new Map<string, any>();
   for (const st of standings) {
     if (!teamMap.has(st.teamId)) {
       teamMap.set(st.teamId, {
-        team: st.team,
+        team: st.Team,
         played: 0,
         won: 0,
         points: 0

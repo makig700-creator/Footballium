@@ -5,7 +5,7 @@ export async function GET() {
   try {
     const stats = await prisma.playerStats.findMany({
       where: { goals: { gt: 0 } },
-      include: { player: { include: { team: true } }, tournament: true }
+      include: { player: { include: { team: true } }, Tournament: true }
     });
 
     const playerMap = new Map<string, any>();

@@ -34,9 +34,9 @@ export async function GET(request: Request) {
       where: {
         OR: [
           { title: { contains: query } },
-          { tags: { contains: query } },
+          { excerpt: { contains: query } },
         ],
-        published: true,
+        status: "PUBLISHED",
       },
       take: 5,
     }),

@@ -13,7 +13,7 @@ export async function GET(
         { goalDiff: 'desc' },
         { goalsFor: 'desc' }
       ],
-      include: { team: true }
+      include: { Team: true }
     });
     return NextResponse.json(standings);
   } catch (error) {

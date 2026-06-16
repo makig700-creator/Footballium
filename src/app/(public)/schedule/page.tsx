@@ -69,7 +69,7 @@ export default function SchedulePage() {
         <h1 className="text-3xl font-black uppercase tracking-widest text-white mb-6">Розклад матчів</h1>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-2">
-          <Select value={filters.datePreset} onValueChange={(v) => setFilters({...filters, datePreset: v})}>
+          <Select value={filters.datePreset} onValueChange={(v) => setFilters({...filters, datePreset: v || "all"})}>
             <SelectTrigger className="bg-zinc-900 border-white/10 text-white focus:ring-[#CCFF00]">
               <SelectValue placeholder="Час" />
             </SelectTrigger>
@@ -79,7 +79,7 @@ export default function SchedulePage() {
             </SelectContent>
           </Select>
 
-          <Select value={filters.tournamentId} onValueChange={(v) => setFilters({...filters, tournamentId: v})}>
+          <Select value={filters.tournamentId} onValueChange={(v) => setFilters({...filters, tournamentId: v || "all"})}>
             <SelectTrigger className="bg-zinc-900 border-white/10 text-white focus:ring-[#CCFF00]">
               <SelectValue placeholder="Турнір" />
             </SelectTrigger>
@@ -91,7 +91,7 @@ export default function SchedulePage() {
             </SelectContent>
           </Select>
 
-          <Select value={filters.teamId} onValueChange={(v) => setFilters({...filters, teamId: v})}>
+          <Select value={filters.teamId} onValueChange={(v) => setFilters({...filters, teamId: v || "all"})}>
             <SelectTrigger className="bg-zinc-900 border-white/10 text-white focus:ring-[#CCFF00]">
               <SelectValue placeholder="Команда" />
             </SelectTrigger>

@@ -3,11 +3,12 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
+    const { slug } = await params;
     const news = await prisma.news.update({
-      where: { slug: params.slug, status: "PUBLISHED" },
+      where: { slug, status: "PUBLISHED" },
       data: { viewsCount: { increment: 1 } },
       include: {
         author: { select: { name: true } },

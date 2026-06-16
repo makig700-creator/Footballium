@@ -11,7 +11,7 @@ export async function GET(
   try {
     const { id } = await params;
     const session = await auth();
-    if (session?.user?.role !== "ADMIN") {
+    if ((session?.user as any)?.role !== "ADMIN") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -37,7 +37,7 @@ export async function PATCH(
   try {
     const { id } = await params;
     const session = await auth();
-    if (session?.user?.role !== "ADMIN") {
+    if ((session?.user as any)?.role !== "ADMIN") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -46,7 +46,7 @@ export async function PATCH(
 
     if (!result.success) {
       return NextResponse.json(
-        { error: "Invalid data", details: result.error.errors },
+        { error: "Invalid data", details: result.error.issues },
         { status: 400 }
       );
     }
@@ -57,7 +57,7 @@ export async function PATCH(
     });
 
     await logActivity({
-      userId: session.user.id,
+      userId: session?.user?.id as string,
       action: "UPDATE_NEWS",
       entity: "News",
       entityId: news.id,
@@ -78,7 +78,7 @@ export async function DELETE(
   try {
     const { id } = await params;
     const session = await auth();
-    if (session?.user?.role !== "ADMIN") {
+    if ((session?.user as any)?.role !== "ADMIN") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -87,7 +87,7 @@ export async function DELETE(
     });
 
     await logActivity({
-      userId: session.user.id,
+      userId: session?.user?.id as string,
       action: "DELETE_NEWS",
       entity: "News",
       entityId: news.id,
