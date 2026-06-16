@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { MapPin, Calendar, Info, Users, Shield, Activity, TrendingUp, Trophy } from 'lucide-react'
 import { getPositionColor, formatPosition, cn } from '@/lib/utils'
+import { FavoriteButton } from '@/components/FavoriteButton'
 
 export const revalidate = 60
 
@@ -23,7 +24,7 @@ export default async function TeamProfilePage({ params }: { params: Promise<{ id
 
   const teamStandings = await prisma.tournamentStanding.findMany({
     where: { teamId: resolvedParams.id },
-    include: { tournament: true }
+    include: { Tournament: true }
   });
   
   const globalStats = teamStandings.reduce((acc, st) => {
@@ -76,8 +77,15 @@ export default async function TeamProfilePage({ params }: { params: Promise<{ id
           </div>
           
           <div className="text-center md:text-left flex-1">
-            <h1 className="text-4xl md:text-6xl font-black text-white mb-2 uppercase tracking-tight">{team.name}</h1>
-            <p className="text-xl text-[#CCFF00] font-black mb-8 uppercase tracking-widest">[{team.shortName}]</p>
+            <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-8">
+              <div>
+                <h1 className="text-4xl md:text-6xl font-black text-white mb-2 uppercase tracking-tight">{team.name}</h1>
+                <p className="text-xl text-[#CCFF00] font-black uppercase tracking-widest">[{team.shortName}]</p>
+              </div>
+              <div className="shrink-0">
+                <FavoriteButton teamId={team.id} />
+              </div>
+            </div>
             
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-xs font-bold uppercase tracking-widest text-gray-400">
               <span className="flex items-center gap-2 bg-[#0a0a0a] px-4 py-2 rounded-sm border border-gray-800">
@@ -202,7 +210,7 @@ export default async function TeamProfilePage({ params }: { params: Promise<{ id
                 <div key={st.id} className="bg-[#1c1a1a] p-4 border border-gray-800 rounded-sm flex items-center justify-between group">
                   <div>
                     <h4 className="font-bold text-white uppercase tracking-wider group-hover:text-[#CCFF00] transition-colors">
-                      <Link href={`/tournaments/${st.tournamentId}`}>{st.tournament.name}</Link>
+                      <Link href={`/tournaments/${st.tournamentId}`}>{st.Tournament.name}</Link>
                     </h4>
                     <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Місце: {st.position}</span>
                   </div>

@@ -8,7 +8,7 @@ export async function GET(
   try {
     const playerStats = await prisma.playerStats.findMany({
       where: { playerId: (await params).id },
-      include: { tournament: true }
+      include: { Tournament: true }
     });
     
     // Aggregate global stats

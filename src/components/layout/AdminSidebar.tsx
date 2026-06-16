@@ -12,7 +12,7 @@ export function AdminSidebar() {
     { href: '/admin/dashboard', label: 'Огляд', icon: LayoutDashboard },
     { href: '/admin/tournaments', label: 'Турніри', icon: Trophy },
     { href: '/admin/users', label: 'Користувачі', icon: Users },
-    { href: '/admin/settings', label: 'Налаштування', icon: Settings },
+    { href: '/settings', label: 'Налаштування', icon: Settings },
   ];
 
   return (

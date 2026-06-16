@@ -49,6 +49,12 @@ export default async function RefereeDashboardPage() {
           <h1 className="text-3xl font-black text-white tracking-tight uppercase">Панель Судді</h1>
           <p className="text-[#CCFF00] font-bold text-xs uppercase tracking-widest mt-1">Вітаємо, {user.name}</p>
         </div>
+        <Link 
+          href="/referee/settings" 
+          className="flex items-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-white px-4 py-2 rounded-sm font-bold uppercase tracking-widest text-xs transition-colors border border-gray-800"
+        >
+          Налаштування профілю
+        </Link>
       </header>
 
       <section>
@@ -94,7 +100,7 @@ export default async function RefereeDashboardPage() {
             {finishedMatches.length > 0 && (
               <div>
                 <h3 className="text-lg font-black text-gray-500 uppercase tracking-widest mb-4">Завершені</h3>
-                <div className="grid gap-4 opacity-70 hover:opacity-100 transition-opacity">
+                <div className="grid gap-4">
                   {finishedMatches.map(match => <MatchCard key={match.id} match={match} />)}
                 </div>
               </div>
@@ -107,16 +113,22 @@ export default async function RefereeDashboardPage() {
 }
 
 function MatchCard({ match }: { match: any }) {
+  const isFinished = match.status === 'FINISHED';
+  
   return (
-    <div className="bg-[#1c1a1a] p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 border border-gray-800 border-l-4 border-l-[#CCFF00] rounded-sm transition-colors hover:border-gray-700">
+    <div className={`bg-[#1c1a1a] p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 border border-gray-800 border-l-4 rounded-sm transition-all duration-300 hover:border-gray-700 hover:-translate-y-1 hover:shadow-lg hover:shadow-[#CCFF00]/5 ${
+      isFinished ? 'border-l-gray-600 opacity-75 hover:opacity-100' : 
+      match.status === 'LIVE' ? 'border-l-red-500 shadow-lg shadow-red-500/10' : 
+      'border-l-[#CCFF00]'
+    }`}>
       <div className="flex items-center gap-8">
         <div className="text-center shrink-0 w-24">
           <div className={`text-[10px] font-black px-3 py-1 rounded-sm inline-block mb-2 uppercase tracking-widest ${
-            match.status === 'LIVE' ? 'bg-red-500 text-white animate-pulse' :
-            match.status === 'FINISHED' ? 'bg-gray-700 text-white' :
-            'bg-[#CCFF00] text-black'
+            match.status === 'LIVE' ? 'bg-red-500 text-white animate-pulse shadow-md shadow-red-500/20' :
+            isFinished ? 'bg-gray-700 text-white' :
+            'bg-[#CCFF00] text-black shadow-md shadow-[#CCFF00]/10'
           }`}>
-            {match.status}
+            {match.status === 'LIVE' ? 'НАЖИВО' : match.status === 'FINISHED' ? 'ЗАВЕРШЕНО' : 'ЗАПЛАНОВАНО'}
           </div>
           <div className="text-xs text-gray-400 font-bold uppercase tracking-widest mt-1">{formatKickoff(match.kickoff)}</div>
         </div>

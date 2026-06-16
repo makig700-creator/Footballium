@@ -64,8 +64,12 @@ export function Navbar() {
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
                   className="flex items-center gap-2 px-3 py-1.5 rounded-sm bg-gray-900 hover:bg-gray-800 transition-all text-sm border border-gray-800"
                 >
-                  <div className="w-6 h-6 rounded-full bg-[#CCFF00] flex items-center justify-center">
-                    <User className="w-3 h-3 text-black" />
+                  <div className="w-6 h-6 rounded-full bg-zinc-800 flex items-center justify-center overflow-hidden shrink-0 border border-white/10">
+                    {session.user?.image ? (
+                      <img src={session.user.image} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <User className="w-3 h-3 text-zinc-400" />
+                    )}
                   </div>
                   <span className="hidden sm:block text-white font-bold uppercase text-[11px] tracking-wider">{session.user?.name?.split(' ')[0]}</span>
                   <ChevronDown className="w-3 h-3 text-gray-400" />
@@ -73,7 +77,7 @@ export function Navbar() {
                 {userMenuOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-[#0a0a0a] border border-gray-800 py-1 shadow-2xl z-50">
                     <Link
-                      href={(session.user as any)?.role === "ADMIN" ? "/admin/dashboard" : (session.user as any)?.role === "COACH" ? "/dashboard" : (session.user as any)?.role === "REFEREE" ? "/referee/dashboard" : "/"}
+                      href={(session.user as any)?.role === "ADMIN" ? "/admin/dashboard" : (session.user as any)?.role === "COACH" ? "/dashboard" : (session.user as any)?.role === "REFEREE" ? "/referee/dashboard" : "/user/settings"}
                       onClick={() => setUserMenuOpen(false)}
                       className="flex items-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-wider text-gray-300 hover:text-[#CCFF00] hover:bg-gray-900 transition-colors"
                     >
