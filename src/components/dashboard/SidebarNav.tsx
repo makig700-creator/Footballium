@@ -9,7 +9,7 @@ const links = [
   { href: '/dashboard', label: 'Огляд', icon: LayoutDashboard },
   { href: '/dashboard/matches', label: 'Матчі', icon: CalendarDays },
   { href: '/coach/team', label: 'Склад', icon: Users },
-  { href: '#', label: 'Налаштування', icon: Settings },
+  { href: '/coach/settings', label: 'Налаштування', icon: Settings },
 ]
 
 export function SidebarNav() {

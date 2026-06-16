@@ -9,7 +9,7 @@ export async function GET(
     const teamId = (await params).id;
     const teamStandings = await prisma.tournamentStanding.findMany({
       where: { teamId },
-      include: { tournament: true }
+      include: { Tournament: true }
     });
     
     // Aggregate global stats
