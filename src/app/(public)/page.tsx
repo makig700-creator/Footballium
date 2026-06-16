@@ -5,6 +5,7 @@ import { auth } from '@/lib/auth'
 import { Calendar, MapPin, Users, Flag, Trophy, Shield, Activity } from 'lucide-react'
 import { TournamentActionButtons } from '@/components/tournaments/tournament-action-buttons'
 import { getApplicationStatus } from '@/lib/tournament-utils'
+import { NewsWidget } from '@/components/news/NewsWidget'
 
 export const revalidate = 60 // Revalidate every minute
 
@@ -201,6 +202,9 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* 2.5 NEWS WIDGET */}
+      <NewsWidget />
 
       {/* 3. HOW IT WORKS (ROLES) */}
       <section className="py-24 bg-[#000000]">

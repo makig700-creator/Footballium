@@ -1,64 +1,124 @@
-import { prisma } from '@/lib/prisma'
-import Image from 'next/image'
-import Link from 'next/link'
-import { formatRelative } from '@/lib/utils'
-import { Newspaper, Clock } from 'lucide-react'
+import { prisma } from "@/lib/prisma"
+import Link from "next/link"
+import { Calendar, Eye, Heart } from "lucide-react"
 
 export const revalidate = 60
 
-export default async function NewsFeedPage() {
-  const articles = await prisma.news.findMany({
-    where: { published: true },
-    orderBy: { publishedAt: 'desc' },
-  })
+export default async function NewsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>
+}) {
+  const resolvedSearchParams = await searchParams;
+  const page = parseInt(resolvedSearchParams.page || "1")
+  const limit = 9
+  const skip = (page - 1) * limit
+
+  const [news, total] = await Promise.all([
+    prisma.news.findMany({
+      where: { status: "PUBLISHED" },
+      orderBy: { publishedAt: "desc" },
+      skip,
+      take: limit,
+      include: {
+        author: { select: { name: true } },
+        _count: { select: { likes: true } }
+      }
+    }),
+    prisma.news.count({ where: { status: "PUBLISHED" } })
+  ])
+
+  const totalPages = Math.ceil(total / limit)
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
-      <div className="flex items-center gap-4 border-b border-gray-900 pb-6">
-        <div className="w-12 h-12 rounded-sm bg-[#CCFF00] flex items-center justify-center shadow-lg border border-[#CCFF00]">
-          <Newspaper className="w-6 h-6 text-black" />
-        </div>
-        <div>
-          <h1 className="text-3xl font-black text-white tracking-tight uppercase">Останні новини</h1>
-          <p className="text-[#CCFF00] font-bold text-xs uppercase tracking-widest mt-1">Свіжі новини, звіти про матчі та аналітика</p>
-        </div>
+    <div className="container mx-auto px-4 py-8 max-w-7xl">
+      <div className="mb-12">
+        <h1 className="text-4xl md:text-5xl font-black text-white uppercase tracking-tighter mb-4">
+          Останні <span className="text-[#ccff00]">Новини</span>
+        </h1>
+        <p className="text-gray-400 max-w-2xl text-lg">
+          Дізнавайтесь про останні події, результати матчів та новини платформи.
+        </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {articles.map((article) => (
-          <Link key={article.id} href={`/news/${article.slug}`} className="group bg-[#1c1a1a] rounded-sm overflow-hidden flex flex-col h-full border border-gray-800 hover:border-[#CCFF00] transition-colors">
-            <div className="aspect-[16/10] bg-[#0a0a0a] relative overflow-hidden border-b border-gray-800">
-              {article.coverImage ? (
-                <Image src={article.coverImage} alt={article.title} fill className="object-cover group-hover:scale-105 transition-transform duration-700 mix-blend-luminosity opacity-80 group-hover:opacity-100 group-hover:mix-blend-normal" />
-              ) : (
-                <div className="absolute inset-0 bg-[#000000] flex items-center justify-center">
-                  <Newspaper className="w-12 h-12 text-gray-800" />
+      {news.length === 0 ? (
+        <div className="text-center py-20 bg-[#0a0a0a] rounded-sm border border-gray-900">
+          <p className="text-gray-500 font-bold uppercase tracking-widest">Новин поки немає</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {news.map((item) => (
+            <Link 
+              key={item.id} 
+              href={`/news/${item.slug}`}
+              className="group flex flex-col bg-[#0a0a0a] border border-gray-900 rounded-sm overflow-hidden hover:border-gray-700 transition-colors"
+            >
+              <div className="aspect-[16/9] relative bg-[#111] overflow-hidden">
+                {item.coverImage ? (
+                  <img 
+                    src={item.coverImage} 
+                    alt={item.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-gray-800">
+                    <span className="font-black uppercase tracking-widest text-2xl opacity-50">Футбол</span>
+                  </div>
+                )}
+              </div>
+              <div className="p-6 flex flex-col flex-grow">
+                <div className="flex items-center gap-4 text-xs font-bold uppercase tracking-widest text-gray-500 mb-4">
+                  <div className="flex items-center gap-1.5">
+                    <Calendar className="w-3.5 h-3.5 text-[#ccff00]" />
+                    {item.publishedAt ? new Date(item.publishedAt).toLocaleDateString("uk-UA") : ""}
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <Eye className="w-3.5 h-3.5" />
+                    {item.viewsCount}
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <Heart className="w-3.5 h-3.5" />
+                    {item._count.likes}
+                  </div>
                 </div>
-              )}
-              <div className="absolute top-3 left-3 px-3 py-1 bg-[#CCFF00] text-black text-[10px] font-black rounded-sm uppercase tracking-widest shadow-lg">
-                {article.category}
+                
+                <h3 className="text-xl font-black text-white leading-tight mb-3 group-hover:text-[#ccff00] transition-colors">
+                  {item.title}
+                </h3>
+                
+                {item.excerpt && (
+                  <p className="text-gray-400 text-sm line-clamp-3 mb-4 flex-grow">
+                    {item.excerpt}
+                  </p>
+                )}
+                
+                <div className="mt-auto pt-4 border-t border-gray-900 flex items-center justify-between text-xs font-bold uppercase tracking-widest text-gray-500">
+                  <span>{item.author.name}</span>
+                  <span className="text-[#ccff00] group-hover:underline">Читати →</span>
+                </div>
               </div>
-            </div>
-            
-            <div className="p-6 flex flex-col flex-1">
-              <h3 className="text-xl font-bold text-white mb-3 group-hover:text-[#CCFF00] transition-colors leading-tight line-clamp-3 uppercase">
-                {article.title}
-              </h3>
-              <p className="text-sm text-gray-400 line-clamp-2 mb-4 flex-1">
-                {article.excerpt}
-              </p>
-              
-              <div className="mt-auto pt-4 border-t border-gray-800 flex items-center justify-between text-[10px] uppercase font-bold tracking-widest text-gray-500">
-                <span className="truncate pr-4">{article.authorName}</span>
-                <span className="flex items-center gap-1.5 shrink-0 text-[#CCFF00]">
-                  <Clock className="w-3.5 h-3.5" />
-                  {formatRelative(article.publishedAt!)}
-                </span>
-              </div>
-            </div>
-          </Link>
-        ))}
-      </div>
+            </Link>
+          ))}
+        </div>
+      )}
+
+      {totalPages > 1 && (
+        <div className="mt-12 flex justify-center gap-2">
+          {Array.from({ length: totalPages }).map((_, i) => (
+            <Link
+              key={i}
+              href={`/news?page=${i + 1}`}
+              className={`w-10 h-10 flex items-center justify-center text-sm font-bold rounded-sm border transition-colors ${
+                page === i + 1 
+                  ? "bg-[#ccff00] text-black border-[#ccff00]" 
+                  : "bg-[#0a0a0a] text-gray-400 border-gray-900 hover:border-gray-700 hover:text-white"
+              }`}
+            >
+              {i + 1}
+            </Link>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
