@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Trophy, Users, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, Trophy, Users, Settings, LogOut, Newspaper } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export function AdminSidebar() {
@@ -12,6 +12,7 @@ export function AdminSidebar() {
     { href: '/admin/dashboard', label: 'Огляд', icon: LayoutDashboard },
     { href: '/admin/tournaments', label: 'Турніри', icon: Trophy },
     { href: '/admin/users', label: 'Користувачі', icon: Users },
+    { href: '/admin/news', label: 'Новини', icon: Newspaper },
     { href: '/settings', label: 'Налаштування', icon: Settings },
   ];
 

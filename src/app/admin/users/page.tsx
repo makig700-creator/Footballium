@@ -54,7 +54,7 @@ export default async function AdminUsersPage() {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-xs font-bold uppercase tracking-widest">
-                    {user.team ? <span className="text-[#ccff00]">{user.team.name}</span> : <span className="text-gray-600">—</span>}
+                    {user.role === 'COACH' && user.team ? <span className="text-[#ccff00]">{user.team.name}</span> : <span className="text-gray-600">—</span>}
                   </td>
                   <td className="px-6 py-4 text-xs">
                     {new Date(user.createdAt).toLocaleDateString('uk-UA')}
