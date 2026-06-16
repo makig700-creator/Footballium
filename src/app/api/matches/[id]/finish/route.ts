@@ -67,7 +67,7 @@ export async function POST(
           { goalDiff: 'desc' },
           { goalsFor: 'desc' }
         ],
-        include: { team: true }
+        include: { Team: true }
       });
       await pusherServer.trigger(`tournament-${updatedMatch.tournamentId}`, 'standings-updated', {
         standings: updatedStandings
