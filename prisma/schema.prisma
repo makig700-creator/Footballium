@@ -87,6 +87,8 @@ model User {
   tournamentsCreated  Tournament[]
   matchesRefereed     Match[]      @relation("MatchReferee")
   activityLogs        ActivityLog[]
+  news                News[]
+  newsLikes           NewsLike[]
 }
 
 model Account {
@@ -246,20 +248,38 @@ model MatchEvent {
   match       Match     @relation(fields: [matchId], references: [id])
 }
 
+enum NewsStatus {
+  DRAFT
+  PUBLISHED
+}
+
 model News {
-  id          String   @id @default(cuid())
+  id          String      @id @default(cuid())
   title       String
-  slug        String   @unique
-  excerpt     String
-  content     String
+  slug        String      @unique
+  excerpt     String?
+  content     String      @db.Text
   coverImage  String?
-  category    String
-  tags        String   @default("")
-  authorName  String   @default("Editorial Team")
-  published   Boolean  @default(true)
-  publishedAt DateTime @default(now())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  status      NewsStatus  @default(DRAFT)
+  authorId    String
+  publishedAt DateTime?
+  viewsCount  Int         @default(0)
+  author      User        @relation(fields: [authorId], references: [id])
+  likes       NewsLike[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model NewsLike {
+  id        String   @id @default(cuid())
+  newsId    String
+  userId    String
+  createdAt DateTime @default(now())
+
+  news      News     @relation(fields: [newsId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([newsId, userId])
 }
 
 model TournamentStanding {
