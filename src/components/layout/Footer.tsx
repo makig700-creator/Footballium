@@ -77,10 +77,7 @@ export function Footer() {
           <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6">
             <Link href="/privacy" className="text-zinc-600 hover:text-white text-xs font-bold uppercase tracking-widest transition-colors">Конфіденційність</Link>
             <Link href="/terms" className="text-zinc-600 hover:text-white text-xs font-bold uppercase tracking-widest transition-colors">Умови</Link>
-            <div className="flex items-center gap-2 text-zinc-600 text-xs font-bold uppercase tracking-widest md:ml-4 md:pl-6 md:border-l border-white/10">
-              <span>Powered by</span>
-              <span className="text-[#CCFF00]">Next.js</span>
-            </div>
+
           </div>
         </div>
       </div>
