@@ -10,11 +10,11 @@ const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 
 export const metadata: Metadata = {
-  title: { default: 'ФК Функціонал', template: '%s | ФК Функціонал' },
+  title: { default: 'Footballium', template: '%s | Footballium' },
   description: 'Найкраща платформа футбольних новин та управління. Результати матчів, турнірні таблиці, профілі команд та інструменти тренера.',
   keywords: ['футбол', 'новини футболу', 'матчі', 'турнірна таблиця', 'тренер', 'результати'],
   openGraph: {
-    title: 'ФК Функціонал',
+    title: 'Footballium',
     description: 'Найкраща платформа футбольних новин та управління.',
     type: 'website',
   },
