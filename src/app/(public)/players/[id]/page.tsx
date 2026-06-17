@@ -3,7 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { User, Activity, Shield, Hash, MapPin } from 'lucide-react'
-import { getPositionColor, cn, formatPosition } from '@/lib/utils'
+import { cn, formatPosition } from '@/lib/utils'
 
 export const revalidate = 60
 
@@ -23,22 +23,18 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
   const globalStats = player.stats.reduce((acc, stat) => {
     acc.appearances += stat.matchesPlayed;
     acc.goals += stat.goals;
-    acc.assists += 0; // if we add assists later
     acc.minutesPlayed += stat.minutesPlayed;
-    acc.cleanSheets += 0;
     acc.yellowCards += stat.yellowCards;
     acc.redCards += stat.redCards;
     return acc;
   }, {
-    appearances: 0, goals: 0, assists: 0, minutesPlayed: 0, cleanSheets: 0, yellowCards: 0, redCards: 0
+    appearances: 0, goals: 0, minutesPlayed: 0, yellowCards: 0, redCards: 0
   });
 
   const stats = [
     { label: 'Матчі', value: globalStats.appearances },
     { label: 'Голи', value: globalStats.goals },
-    { label: 'Асисти', value: globalStats.assists },
     { label: 'Хвилини', value: globalStats.minutesPlayed },
-    { label: 'Сухі матчі', value: globalStats.cleanSheets },
     { label: 'Рейтинг', value: 'N/A' },
   ]
 
@@ -118,9 +114,9 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
           <h2 className="text-2xl font-black text-white uppercase tracking-widest">Статистика</h2>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
           {stats.map((stat) => (
-            <div key={stat.label} className="bg-[#1c1a1a] border border-gray-800 p-8 flex flex-col items-center justify-center text-center rounded-sm">
+            <div key={stat.label} className="bg-[#1c1a1a] border border-gray-800 p-8 flex flex-col items-center justify-center text-center rounded-sm hover:border-[#CCFF00]/50 transition-colors duration-300">
               <span className="text-4xl md:text-5xl font-black text-[#CCFF00] mb-4">{stat.value}</span>
               <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{stat.label}</span>
             </div>

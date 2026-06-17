@@ -140,9 +140,21 @@ export async function recalculateStandings(tournamentId: string) {
 }
 
 export async function recalculatePlayerStats(playerId: string, tournamentId: string) {
+  const tournament = await prisma.tournament.findUnique({
+    where: { id: tournamentId },
+    select: { format: true }
+  });
+  
+  const matchLength = tournament?.format === '5x5' ? 30 : 90;
+
   const matches = await prisma.match.findMany({
     where: { tournamentId },
-    select: { id: true, status: true, lineup: { include: { slots: true } } }
+    select: { 
+      id: true, 
+      status: true, 
+      lineup: { include: { slots: true } },
+      events: true
+    }
   });
 
   const matchIds = matches.map(m => m.id);
@@ -171,9 +183,13 @@ export async function recalculatePlayerStats(playerId: string, tournamentId: str
   
   for (const match of matches) {
     if (match.status !== MatchStatus.FINISHED) continue;
-    if (match.lineup?.slots.some(s => s.playerId === playerId)) {
+    
+    const isStarter = match.lineup?.slots.some(s => s.playerId === playerId && s.isStarter === true);
+    const isSubbedIn = match.events.some(e => e.type === EventType.SUBSTITUTION && e.playerId === playerId);
+    
+    if (isStarter || isSubbedIn) {
       matchesPlayed += 1;
-      minutesPlayed += 90; // Approximation
+      minutesPlayed += matchLength;
     }
   }
 
