@@ -35,11 +35,21 @@ export async function POST(req: NextRequest, props: { params: Promise<{ id: stri
       );
     }
 
+    let legs = 1;
+    try {
+      const body = await req.json();
+      if (body.legs === 2) {
+        legs = 2;
+      }
+    } catch (e) {
+      // Ignore JSON parse error, default to 1 leg
+    }
+
     const teamIds = tournament.teams.map((t) => t.teamId);
     let matchesData;
 
     if (tournament.bracketType === "ROUND_ROBIN") {
-      matchesData = generateRoundRobin(teamIds, tournament.id);
+      matchesData = generateRoundRobin(teamIds, tournament.id, legs);
     } else if (tournament.bracketType === "SINGLE_ELIMINATION") {
       matchesData = generateSingleElimination(teamIds, tournament.id);
     } else {

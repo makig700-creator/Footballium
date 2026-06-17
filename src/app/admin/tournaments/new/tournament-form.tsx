@@ -155,7 +155,6 @@ export function TournamentForm() {
                   </FormControl>
                   <SelectContent className="bg-[#111111] border-gray-800 text-white">
                     <SelectItem value="5x5" className="focus:bg-[#CCFF00]/20 focus:text-white">5x5</SelectItem>
-                    <SelectItem value="8x8" className="focus:bg-[#CCFF00]/20 focus:text-white">8x8</SelectItem>
                     <SelectItem value="11x11" className="focus:bg-[#CCFF00]/20 focus:text-white">11x11</SelectItem>
                   </SelectContent>
                 </Select>

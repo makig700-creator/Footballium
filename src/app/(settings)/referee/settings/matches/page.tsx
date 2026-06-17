@@ -44,7 +44,7 @@ export default function RefereeMatchesPage() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm text-zinc-400">{new Date(match.scheduledAt).toLocaleString()}</p>
+                  <p className="text-sm text-zinc-400">{new Date(match.scheduledAt || match.kickoff).toLocaleString()}</p>
                   <span className={`inline-block mt-1 px-2 py-0.5 text-[10px] font-bold uppercase rounded ${match.status === 'FINISHED' ? 'bg-zinc-800 text-zinc-400' : 'bg-[#CCFF00]/10 text-[#CCFF00]'}`}>
                     {match.status}
                   </span>

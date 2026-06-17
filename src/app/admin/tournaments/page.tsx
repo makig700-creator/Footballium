@@ -12,6 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
+import { DeleteTournamentButton } from "./delete-tournament-button"
 
 export default async function TournamentsPage() {
   const session = await auth()
@@ -74,11 +75,14 @@ export default async function TournamentsPage() {
                   {tournament._count.teams} / {tournament.maxTeams}
                 </TableCell>
                 <TableCell>
-                  <Link href={`/admin/tournaments/${tournament.id}`}>
-                    <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
-                      Деталі
-                    </Button>
-                  </Link>
+                  <div className="flex items-center gap-2">
+                    <Link href={`/admin/tournaments/${tournament.id}`}>
+                      <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
+                        Деталі
+                      </Button>
+                    </Link>
+                    <DeleteTournamentButton id={tournament.id} name={tournament.name} />
+                  </div>
                 </TableCell>
               </TableRow>
             ))}

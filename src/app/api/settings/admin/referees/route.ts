@@ -15,6 +15,8 @@ export async function GET(req: NextRequest) {
         id: true,
         name: true,
         email: true,
+        photo: true,
+        refereeCategory: true,
         matchesRefereed: {
           select: {
             id: true,
