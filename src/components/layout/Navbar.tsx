@@ -85,7 +85,7 @@ export function Navbar() {
                     </Link>
                     <hr className="border-gray-800 my-1" />
                     <button
-                      onClick={() => { signOut({ callbackUrl: '/auth/login' }); setUserMenuOpen(false) }}
+                      onClick={() => { signOut({ callbackUrl: window.location.origin + '/auth/login' }); setUserMenuOpen(false) }}
                       className="w-full flex items-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-wider text-gray-300 hover:text-red-500 hover:bg-gray-900 transition-colors"
                     >
                       <LogOut className="w-4 h-4" /> Вийти
