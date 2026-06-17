@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const session = await auth();
-    if (!session?.user) {
+    if (!session?.user || (session.user as any).role !== "USER") {
       return new NextResponse("Unauthorized", { status: 403 });
     }
 

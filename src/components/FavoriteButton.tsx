@@ -57,6 +57,7 @@ export function FavoriteButton({ teamId }: FavoriteButtonProps) {
   };
 
   if (isLoading) return null;
+  if (!session?.user || (session.user as any).role !== "USER") return null;
 
   return (
     <Button
