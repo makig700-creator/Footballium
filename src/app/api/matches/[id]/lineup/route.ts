@@ -45,13 +45,19 @@ export async function POST(
 
     const data = parsedData.data
 
+    const existingLineup = await prisma.lineup.findUnique({ where: { matchId } });
+    if (existingLineup) {
+      await prisma.lineupSlot.deleteMany({
+        where: { lineupId: existingLineup.id, player: { teamId } }
+      });
+    }
+
     const lineup = await prisma.lineup.upsert({
       where: { matchId },
       update: {
         formation: data.formation,
         submittedAt: new Date(),
         slots: {
-          deleteMany: {},
           create: [
             ...data.starters.map(s => ({
               playerId: s.playerId,

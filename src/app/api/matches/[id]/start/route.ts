@@ -17,6 +17,17 @@ export async function POST(
     const matchId = (await params).id;
     const match = await prisma.match.findUnique({
       where: { id: matchId },
+      include: {
+        lineup: {
+          include: {
+            slots: {
+              include: {
+                player: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     if (!match) {
@@ -25,6 +36,16 @@ export async function POST(
 
     if (match.refereeId && match.refereeId !== session.user?.id) {
       return NextResponse.json({ error: "Not assigned referee" }, { status: 403 });
+    }
+
+    const hasHomeLineup = match.lineup?.slots.some((slot) => slot.player.teamId === match.homeTeamId);
+    const hasAwayLineup = match.awayTeamId ? match.lineup?.slots.some((slot) => slot.player.teamId === match.awayTeamId) : true;
+
+    if (!hasHomeLineup || !hasAwayLineup) {
+      return NextResponse.json(
+        { error: "Обидві команди повинні заповнити заявки на матч перед його початком" },
+        { status: 400 }
+      );
     }
 
     const updatedMatch = await prisma.match.update({
