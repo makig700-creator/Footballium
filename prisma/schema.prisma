@@ -58,7 +58,7 @@ model TournamentTeam {
   reviewedAt   DateTime?
   reviewedById String?
   team         Team       @relation(fields: [teamId], references: [id])
-  tournament   Tournament @relation(fields: [tournamentId], references: [id])
+  tournament   Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
 
   @@unique([tournamentId, teamId])
 }
@@ -180,7 +180,7 @@ model PlayerStats {
   minutesPlayed Int        @default(0)
   updatedAt     DateTime
   player        Player     @relation(fields: [playerId], references: [id], onDelete: Cascade)
-  Tournament    Tournament @relation(fields: [tournamentId], references: [id])
+  Tournament    Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
 
   @@unique([playerId, tournamentId])
 }
@@ -207,7 +207,7 @@ model Match {
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
 
-  tournament Tournament?  @relation(fields: [tournamentId], references: [id])
+  tournament Tournament?  @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
   homeTeam   Team         @relation("HomeTeam", fields: [homeTeamId], references: [id])
   awayTeam   Team?        @relation("AwayTeam", fields: [awayTeamId], references: [id])
   referee    User?        @relation("MatchReferee", fields: [refereeId], references: [id])
@@ -220,7 +220,7 @@ model Lineup {
   matchId     String       @unique
   formation   String       @default("4-3-3")
   submittedAt DateTime     @default(now())
-  match       Match        @relation(fields: [matchId], references: [id])
+  match       Match        @relation(fields: [matchId], references: [id], onDelete: Cascade)
   slots       LineupSlot[]
 }
 
@@ -245,7 +245,7 @@ model MatchEvent {
   teamId      String
   comment     String?
   createdAt   DateTime  @default(now())
-  match       Match     @relation(fields: [matchId], references: [id])
+  match       Match     @relation(fields: [matchId], references: [id], onDelete: Cascade)
 }
 
 enum NewsStatus {
@@ -297,7 +297,7 @@ model TournamentStanding {
   points       Int        @default(0)
   updatedAt    DateTime
   Team         Team       @relation(fields: [teamId], references: [id])
-  Tournament   Tournament @relation(fields: [tournamentId], references: [id])
+  Tournament   Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
 
   @@unique([tournamentId, teamId])
 }

@@ -73,16 +73,15 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
       return new NextResponse("Not Found", { status: 404 });
     }
 
-    if (tournament.status !== "DRAFT") {
-      return new NextResponse("Can only delete tournaments in DRAFT status", { status: 400 });
-    }
-
-    await prisma.tournament.delete({
-      where: { id: params.id },
+    await prisma.$transaction(async (tx) => {
+      await tx.tournament.delete({
+        where: { id: params.id },
+      });
     });
 
     return new NextResponse(null, { status: 204 });
   } catch (error) {
+    console.error("DELETE_TOURNAMENT_ERROR", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }
