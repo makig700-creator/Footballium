@@ -6,7 +6,8 @@ import { TournamentTeam, Match } from "@prisma/client";
  */
 export function generateRoundRobin(
   teams: string[],
-  tournamentId: string
+  tournamentId: string,
+  legs: number = 1
 ): Omit<Match, "id" | "createdAt" | "updatedAt" | "minute" | "lineup" | "homeScore" | "awayScore" | "scheduledAt" | "refereeId" | "startedAt" | "finishedAt">[] {
   const matches: Omit<Match, "id" | "createdAt" | "updatedAt" | "minute" | "lineup" | "homeScore" | "awayScore" | "scheduledAt" | "refereeId" | "startedAt" | "finishedAt">[] = [];
   const numTeams = teams.length;
@@ -44,6 +45,20 @@ export function generateRoundRobin(
     const first = currentTeams[0];
     const last = currentTeams.pop()!;
     currentTeams = [first, last, ...currentTeams.slice(1)];
+  }
+
+  // If 2 legs, duplicate matches with swapped home/away
+  if (legs === 2) {
+    const firstLegMatches = [...matches];
+    for (const m of firstLegMatches) {
+      matches.push({
+        ...m,
+        homeTeamId: m.awayTeamId as string,
+        awayTeamId: m.homeTeamId,
+        round: m.round! + totalRounds,
+        matchNumber: matchNumber++,
+      });
+    }
   }
 
   return matches;

@@ -48,6 +48,7 @@ export default async function TournamentApplicationsPage(props: { params: Promis
             status={tournament.status as any} 
             approvedCount={approvedCount} 
             minTeams={tournament.minTeams} 
+            bracketType={tournament.bracketType}
           />
         </div>
       </div>
