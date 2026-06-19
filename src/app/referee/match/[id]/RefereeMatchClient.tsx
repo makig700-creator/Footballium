@@ -81,11 +81,16 @@ export function RefereeMatchClient({ match: initialMatch }: { match: any }) {
     setIsLoading(false)
   }
 
-  const activeTeamPlayers = teamId === match.homeTeamId
-    ? match.homeTeam.players
-    : teamId === match.awayTeamId
-      ? match.awayTeam.players
-      : []
+  const activeTeamPlayers = match.lineup?.slots
+    ? match.lineup.slots
+        .filter((s: any) => s.player.teamId === teamId)
+        .map((s: any) => s.player)
+        .sort((a: any, b: any) => a.number - b.number)
+    : teamId === match.homeTeamId
+      ? match.homeTeam.players
+      : teamId === match.awayTeamId
+        ? match.awayTeam.players
+        : []
 
   return (
     <div className="max-w-2xl mx-auto pb-20">
@@ -103,13 +108,19 @@ export function RefereeMatchClient({ match: initialMatch }: { match: any }) {
                   <span className="w-2 h-2 rounded-full bg-red-500"></span>
                   LIVE
                 </span>
-              ) : match.status}
+              ) : match.status === "FINISHED" ? (
+                "МАТЧ ЗАВЕРШЕНО"
+              ) : (
+                match.status
+              )}
             </div>
-            <div className="text-2xl font-bold text-white bg-gray-900 rounded px-4 py-2 flex items-center justify-center gap-2">
-              <button disabled={match.status !== "LIVE"} onClick={() => updateMinute(minute - 1)} className="text-gray-500 hover:text-white">-</button>
-              {formatMinute(minute)}
-              <button disabled={match.status !== "LIVE"} onClick={() => updateMinute(minute + 1)} className="text-gray-500 hover:text-white">+</button>
-            </div>
+            {match.status !== "FINISHED" && (
+              <div className="text-2xl font-bold text-white bg-gray-900 rounded px-4 py-2 flex items-center justify-center gap-2">
+                <button disabled={match.status !== "LIVE"} onClick={() => updateMinute(minute - 1)} className="text-gray-500 hover:text-white">-</button>
+                {formatMinute(minute)}
+                <button disabled={match.status !== "LIVE"} onClick={() => updateMinute(minute + 1)} className="text-gray-500 hover:text-white">+</button>
+              </div>
+            )}
           </div>
           <div className="flex-1">
             <div className="text-xl font-bold text-white mb-2">{match.awayTeam?.name}</div>
