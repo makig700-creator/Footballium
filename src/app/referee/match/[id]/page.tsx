@@ -22,6 +22,13 @@ export default async function RefereeMatchPage(props: { params: Promise<{ id: st
       },
       events: {
         orderBy: { createdAt: "desc" }
+      },
+      lineup: {
+        include: {
+          slots: {
+            include: { player: true }
+          }
+        }
       }
     }
   })
