@@ -14,10 +14,14 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const teamId = (session.user as any).teamId
-    if (!teamId) {
+    const team = await prisma.team.findUnique({
+      where: { coachId: session.user.id }
+    })
+
+    if (!team) {
       return NextResponse.json({ error: 'No team assigned' }, { status: 403 })
     }
+    const teamId = team.id
 
     const resolvedParams = await params
     const matchId = resolvedParams.id
