@@ -46,6 +46,8 @@ export async function POST(
       minute: updatedMatch.minute,
       events: updatedMatch.events,
     });
+    
+    await pusherServer.trigger('global', 'match-updated', { matchId });
 
     if (updatedMatch.tournamentId) {
       await recalculateStandings(updatedMatch.tournamentId);

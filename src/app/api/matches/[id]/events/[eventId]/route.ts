@@ -80,6 +80,8 @@ export async function DELETE(
       minute: updatedMatch.minute,
       events: allEvents,
     });
+    
+    await pusherServer.trigger('global', 'match-updated', { matchId });
 
     return NextResponse.json({ success: true });
   } catch (error) {

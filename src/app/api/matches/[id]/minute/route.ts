@@ -39,6 +39,8 @@ export async function PATCH(
       awayScore: updatedMatch.awayScore,
       minute: updatedMatch.minute,
     });
+    
+    await pusherServer.trigger('global', 'match-updated', { matchId });
 
     return NextResponse.json({ success: true, minute: updatedMatch.minute });
   } catch (error) {

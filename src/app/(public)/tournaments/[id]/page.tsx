@@ -7,8 +7,9 @@ import { Calendar, Users, Trophy, Shield, MapPin, Activity } from "lucide-react"
 import { LeagueTable } from "@/components/standings/LeagueTable"
 import { TournamentApplicationBlock } from "@/components/tournaments/tournament-application-block"
 import { getApplicationStatus } from "@/lib/tournament-utils"
+import { LiveTournamentUpdater } from "./LiveTournamentUpdater"
 
-export const revalidate = 60 // Revalidate every minute
+export const dynamic = 'force-dynamic'
 
 export default async function TournamentPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -79,6 +80,8 @@ export default async function TournamentPage({ params }: { params: Promise<{ id:
 
   return (
     <div className="min-h-screen bg-[#000000] text-gray-200">
+      <LiveTournamentUpdater tournamentId={tournament.id} />
+      
       {/* Hero Section */}
       <div className="relative w-full py-20 border-b border-gray-900 bg-[#0a0a0a] overflow-hidden">
         {/* Background elements */}

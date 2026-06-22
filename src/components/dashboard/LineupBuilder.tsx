@@ -189,6 +189,11 @@ export function LineupBuilder({
                           if (player) {
                             setValue(`starters.${index}.slotLabel`, player.number.toString())
                           }
+                        } else if (!isFutsal && !field.slotLabel) {
+                          const player = players.find(p => p.id === e.target.value)
+                          if (player) {
+                            setValue(`starters.${index}.slotLabel`, formatPosition(player.position))
+                          }
                         }
                       }}
                       onBlur={f.onBlur}

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { EventType, MatchStatus } from "@prisma/client"
 import { formatMinute, getEventIcon } from "@/lib/match-utils"
 import { pusherClient } from "@/lib/pusher-client"
+import { toast } from "sonner"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 
 export function RefereeMatchClient({ match: initialMatch }: { match: any }) {
@@ -71,6 +72,9 @@ export function RefereeMatchClient({ match: initialMatch }: { match: any }) {
       setPlayerId("")
       setPlayerOutId("")
       setComment("")
+    } else {
+      const err = await res.json()
+      toast.error(err.error || "Помилка збереження події")
     }
     setIsLoading(false)
   }
@@ -81,16 +85,25 @@ export function RefereeMatchClient({ match: initialMatch }: { match: any }) {
     setIsLoading(false)
   }
 
-  const activeTeamPlayers = match.lineup?.slots
-    ? match.lineup.slots
-        .filter((s: any) => s.player.teamId === teamId)
-        .map((s: any) => s.player)
-        .sort((a: any, b: any) => a.number - b.number)
+  const activeTeamSlots = match.lineup?.slots
+    ? match.lineup.slots.filter((s: any) => s.player.teamId === teamId)
+    : []
+
+  const activeTeamPlayers = activeTeamSlots.length > 0
+    ? activeTeamSlots.map((s: any) => s.player).sort((a: any, b: any) => a.number - b.number)
     : teamId === match.homeTeamId
       ? match.homeTeam.players
       : teamId === match.awayTeamId
         ? match.awayTeam.players
         : []
+
+  const availablePlayersIn = eventType === "SUBSTITUTION" && activeTeamSlots.length > 0
+    ? activeTeamSlots.filter((s: any) => !s.isStarter).map((s: any) => s.player).sort((a: any, b: any) => a.number - b.number)
+    : activeTeamPlayers
+
+  const availablePlayersOut = eventType === "SUBSTITUTION" && activeTeamSlots.length > 0
+    ? activeTeamSlots.filter((s: any) => s.isStarter).map((s: any) => s.player).sort((a: any, b: any) => a.number - b.number)
+    : activeTeamPlayers
 
   return (
     <div className="max-w-2xl mx-auto pb-20">
@@ -196,7 +209,7 @@ export function RefereeMatchClient({ match: initialMatch }: { match: any }) {
                 <label className="block text-gray-500 text-sm mb-1">{eventType === "SUBSTITUTION" ? "Гравець (заходить)" : "Гравець"}</label>
                 <select value={playerId} onChange={(e) => setPlayerId(e.target.value)} className="w-full bg-black border border-gray-800 text-white rounded p-2">
                   <option value="">Оберіть гравця</option>
-                  {activeTeamPlayers.map((p: any) => (
+                  {availablePlayersIn.map((p: any) => (
                     <option key={p.id} value={p.id}>{p.number} - {p.lastName} {p.firstName}</option>
                   ))}
                 </select>
@@ -208,7 +221,7 @@ export function RefereeMatchClient({ match: initialMatch }: { match: any }) {
                 <label className="block text-gray-500 text-sm mb-1">Гравець (виходить)</label>
                 <select value={playerOutId} onChange={(e) => setPlayerOutId(e.target.value)} className="w-full bg-black border border-gray-800 text-white rounded p-2">
                   <option value="">Оберіть гравця</option>
-                  {activeTeamPlayers.map((p: any) => (
+                  {availablePlayersOut.map((p: any) => (
                     <option key={p.id} value={p.id}>{p.number} - {p.lastName} {p.firstName}</option>
                   ))}
                 </select>
@@ -221,7 +234,7 @@ export function RefereeMatchClient({ match: initialMatch }: { match: any }) {
             </div>
 
             <button
-              disabled={isLoading || !eventType || !teamId}
+              disabled={isLoading || !eventType || !teamId || !playerId || (eventType === "SUBSTITUTION" && !playerOutId)}
               onClick={handleAddEvent}
               className="w-full bg-[#CCFF00] text-black font-bold py-3 rounded disabled:opacity-50"
             >

@@ -2,8 +2,9 @@ import { prisma } from '@/lib/prisma'
 import { LeagueTable } from '@/components/standings/LeagueTable'
 import { Trophy } from 'lucide-react'
 import { TournamentSelector } from '@/components/standings/TournamentSelector'
+import { LiveTournamentUpdater } from '../tournaments/[id]/LiveTournamentUpdater'
 
-export const revalidate = 60
+export const dynamic = 'force-dynamic'
 
 export default async function StandingsPage(props: { searchParams: Promise<{ tournamentId?: string }> }) {
   const searchParams = await props.searchParams
@@ -56,6 +57,7 @@ export default async function StandingsPage(props: { searchParams: Promise<{ tou
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8 min-h-[60vh]">
+      {selectedTournamentId && <LiveTournamentUpdater tournamentId={selectedTournamentId} />}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-900 pb-6">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 rounded-sm bg-[#111111] flex items-center justify-center shadow-lg border border-gray-800 shrink-0">

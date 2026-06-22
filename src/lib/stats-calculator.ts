@@ -42,7 +42,7 @@ export async function recalculateStandings(tournamentId: string) {
   const matches = await prisma.match.findMany({
     where: { 
       tournamentId, 
-      status: MatchStatus.FINISHED 
+      status: { in: [MatchStatus.FINISHED, MatchStatus.LIVE] }
     }
   });
 

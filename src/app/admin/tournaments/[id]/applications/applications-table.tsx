@@ -19,12 +19,15 @@ export function ApplicationsTable({ applications, tournamentId }: { applications
         body: JSON.stringify({ action }),
       })
 
-      if (!res.ok) throw new Error("Failed to process action")
+      if (!res.ok) {
+        const errorMessage = await res.text()
+        throw new Error(errorMessage || "Failed to process action")
+      }
 
       toast.success(action === "approve" ? "Заявку схвалено" : "Заявку відхилено")
       router.refresh()
-    } catch (e) {
-      toast.error("Сталася помилка")
+    } catch (e: any) {
+      toast.error(e.message || "Сталася помилка")
     } finally {
       setLoadingId(null)
     }

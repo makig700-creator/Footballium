@@ -22,6 +22,27 @@ export async function PATCH(
 
     const status = action === "approve" ? "APPROVED" : "REJECTED";
 
+    if (status === "APPROVED") {
+      const tournament = await prisma.tournament.findUnique({
+        where: { id: params.id },
+        include: {
+          _count: {
+            select: {
+              teams: { where: { status: "APPROVED" } }
+            }
+          }
+        }
+      });
+
+      if (!tournament) {
+        return new NextResponse("Tournament not found", { status: 404 });
+      }
+
+      if (tournament._count.teams >= tournament.maxTeams) {
+        return new NextResponse("Ліміт команд у турнірі вичерпано. Ви не можете прийняти більше команд.", { status: 400 });
+      }
+    }
+
     const application = await prisma.tournamentTeam.update({
       where: { id: params.appId },
       data: {

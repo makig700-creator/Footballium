@@ -4,8 +4,9 @@ import Image from 'next/image'
 import { format } from 'date-fns'
 import { uk } from 'date-fns/locale'
 import { Calendar, MapPin, Clock, Shield } from 'lucide-react'
+import { LiveMatchUpdater } from './LiveMatchUpdater'
 
-export const revalidate = 60
+export const dynamic = 'force-dynamic'
 
 type Props = {
   params: Promise<{ id: string }>
@@ -70,6 +71,8 @@ export default async function MatchDetailsPage({ params }: Props) {
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
+      <LiveMatchUpdater matchId={match.id} />
+      
       {/* MATCH HEADER / SCOREBOARD */}
       <div className="relative rounded-2xl bg-zinc-900/50 backdrop-blur-md border border-white/10 p-8 sm:p-12 overflow-hidden shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]">
         {/* Abstract Background Element */}

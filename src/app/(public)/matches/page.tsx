@@ -1,8 +1,9 @@
 import { prisma } from '@/lib/prisma'
 import { FixtureCard } from '@/components/matches/FixtureCard'
 import { CalendarDays } from 'lucide-react'
+import { LiveMatchesUpdater } from './LiveMatchesUpdater'
 
-export const revalidate = 60
+export const dynamic = 'force-dynamic'
 
 export default async function MatchesPage() {
   const [liveMatches, upcomingMatches, pastMatches] = await Promise.all([
@@ -26,6 +27,7 @@ export default async function MatchesPage() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16">
+      <LiveMatchesUpdater />
       <div className="flex items-center gap-4 border-b border-gray-900 pb-6">
         <div className="w-12 h-12 rounded-sm bg-[#CCFF00] flex items-center justify-center shadow-lg border border-[#CCFF00]">
           <CalendarDays className="w-6 h-6 text-black" />

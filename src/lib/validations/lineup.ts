@@ -62,7 +62,10 @@ export const getLineupSchema = (format: string = '11x11') => {
       });
     }
 
-    const goalkeeperSlots = data.starters.filter((s) => s.slotLabel.toUpperCase().includes('GK'))
+    const goalkeeperSlots = data.starters.filter((s) => {
+      const label = s.slotLabel.toUpperCase();
+      return label.includes('GK') || label.includes('ВР') || label.includes('ВРТ');
+    });
     if (goalkeeperSlots.length !== 1) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,

@@ -51,6 +51,40 @@ export async function POST(
     const body = await request.json();
     const { type, minute, teamId, playerId, playerOutId, comment } = body;
 
+    // Additional validations
+    if (playerId) {
+      if (type === "YELLOW_CARD") {
+        const yellowCards = await prisma.matchEvent.count({
+          where: { matchId, playerId, type: "YELLOW_CARD" }
+        });
+        if (yellowCards >= 2) {
+          return NextResponse.json({ error: "Гравець вже має ліміт у 2 жовті картки" }, { status: 400 });
+        }
+      }
+
+      if (type === "RED_CARD") {
+        const redCards = await prisma.matchEvent.count({
+          where: { matchId, playerId, type: "RED_CARD" }
+        });
+        if (redCards >= 1) {
+          return NextResponse.json({ error: "Гравець вже має червону картку" }, { status: 400 });
+        }
+      }
+
+      if (type === "SUBSTITUTION") {
+        const lineup = await prisma.lineup.findUnique({
+          where: { matchId },
+          include: { slots: true }
+        });
+        if (lineup) {
+          const slotIn = lineup.slots.find(s => s.playerId === playerId);
+          if (slotIn && slotIn.isStarter) {
+            return NextResponse.json({ error: "Замінювати можна лише на гравця з лави запасних, а не на основного гравця" }, { status: 400 });
+          }
+        }
+      }
+    }
+
     const event = await prisma.matchEvent.create({
       data: {
         matchId,
@@ -103,6 +137,8 @@ export async function POST(
       minute: updatedMatch.minute,
       events: allEvents,
     });
+    
+    await pusherServer.trigger('global', 'match-updated', { matchId });
 
     return NextResponse.json(event);
   } catch (error) {
