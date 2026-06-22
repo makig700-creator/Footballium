@@ -9,7 +9,13 @@ export default async function LineupPage({ params }: { params: Promise<{ id: str
   const session = await auth()
   if (!session || !session.user || (session.user as any).role !== 'COACH') redirect('/auth/login')
 
-  const teamId = (session.user as any).teamId
+  const team = await prisma.team.findUnique({
+    where: { coachId: session.user.id }
+  })
+
+  if (!team) redirect('/dashboard')
+
+  const teamId = team.id
   const resolvedParams = await params
   const matchId = resolvedParams.id
 
