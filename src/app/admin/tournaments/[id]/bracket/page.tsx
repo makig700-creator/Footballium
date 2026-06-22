@@ -4,6 +4,7 @@ import { notFound } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { RefereeSelect } from "./referee-select"
+import { MatchKickoffEdit } from "./match-kickoff-edit"
 
 export default async function TournamentBracketPage(props: { params: Promise<{ id: string }> }) {
   const session = await auth()
@@ -92,11 +93,17 @@ export default async function TournamentBracketPage(props: { params: Promise<{ i
                       Завершено
                     </div>
                   ) : (
-                    <RefereeSelect 
-                      matchId={match.id} 
-                      currentRefereeId={match.refereeId} 
-                      referees={referees} 
-                    />
+                    <>
+                      <RefereeSelect 
+                        matchId={match.id} 
+                        currentRefereeId={match.refereeId} 
+                        referees={referees} 
+                      />
+                      <MatchKickoffEdit
+                        matchId={match.id}
+                        currentKickoff={match.kickoff}
+                      />
+                    </>
                   )}
                 </div>
               ))}

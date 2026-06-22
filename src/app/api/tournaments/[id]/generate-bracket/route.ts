@@ -16,6 +16,9 @@ export async function POST(req: NextRequest, props: { params: Promise<{ id: stri
       include: {
         teams: {
           where: { status: "APPROVED" },
+          include: {
+            team: true,
+          }
         },
       },
     });
@@ -45,13 +48,16 @@ export async function POST(req: NextRequest, props: { params: Promise<{ id: stri
       // Ignore JSON parse error, default to 1 leg
     }
 
-    const teamIds = tournament.teams.map((t) => t.teamId);
+    const teamData = tournament.teams.map((t) => ({
+      id: t.teamId,
+      stadium: t.team.stadium || "TBD",
+    }));
     let matchesData;
 
     if (tournament.bracketType === "ROUND_ROBIN") {
-      matchesData = generateRoundRobin(teamIds, tournament.id, legs);
+      matchesData = generateRoundRobin(teamData, tournament.id, legs);
     } else if (tournament.bracketType === "SINGLE_ELIMINATION") {
-      matchesData = generateSingleElimination(teamIds, tournament.id);
+      matchesData = generateSingleElimination(teamData, tournament.id);
     } else {
       return new NextResponse(`Bracket type ${tournament.bracketType} is not implemented yet.`, { status: 400 });
     }
